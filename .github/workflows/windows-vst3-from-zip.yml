@@ -1,0 +1,66 @@
+name: Panoramize 5.4 - Windows VST3 from source ZIP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-vst3:
+    runs-on: windows-2022
+    timeout-minutes: 90
+    steps:
+      - name: Check out repository containing source ZIP
+        uses: actions/checkout@v4
+
+      - name: Expand source archive
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $zip = Join-Path $env:GITHUB_WORKSPACE 'Panoramize_v5.4.0_Source.zip'
+          if (-not (Test-Path -LiteralPath $zip)) { throw "Missing source archive: $zip" }
+          Expand-Archive -LiteralPath $zip -DestinationPath 'source' -Force
+          $project = (Resolve-Path 'source/Panoramize_v5.4.0').Path
+          if (-not (Test-Path (Join-Path $project 'CMakeLists.txt'))) { throw 'CMakeLists.txt missing in source ZIP' }
+          "PANORAMA_SRC=$project" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Build Windows x64 VST3, run CTest and pluginval strictness 5
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & (Join-Path $env:PANORAMA_SRC 'ci/Build-Test-Windows54.ps1') -InstallScope None
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Collect VST3 and diagnostic logs even if validation failed
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -Path 'artifact' -ItemType Directory -Force | Out-Null
+          if ([string]::IsNullOrWhiteSpace($env:PANORAMA_SRC)) { exit 0 }
+          $vst3Root = Join-Path $env:PANORAMA_SRC 'build-win/Panoramize_Plugin_artefacts/Release/VST3'
+          if (Test-Path $vst3Root) {
+            $bundles = @(Get-ChildItem -Path $vst3Root -Directory -Filter '*.vst3')
+            if ($bundles.Count -gt 0) {
+              New-Item -Path 'artifact/VST3' -ItemType Directory -Force | Out-Null
+              foreach ($bundle in $bundles) {
+                Copy-Item -LiteralPath $bundle.FullName -Destination 'artifact/VST3' -Recurse -Force
+              }
+              'BUILD PRODUCED VST3; check acceptance54.json before treating as validated.' |
+                Set-Content 'artifact/VALIDATION_STATUS.txt'
+            }
+          }
+          $logs = Join-Path $env:PANORAMA_SRC 'windows-validation54'
+          if (Test-Path $logs) { Copy-Item -LiteralPath $logs -Destination 'artifact' -Recurse -Force }
+          $testing = Join-Path $env:PANORAMA_SRC 'build-win/Testing'
+          if (Test-Path $testing) { Copy-Item -LiteralPath $testing -Destination 'artifact' -Recurse -Force }
+
+      - name: Upload VST3 and validation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Panoramize-v5.4-Windows-x64-build-results
+          path: artifact/
+          if-no-files-found: warn
+          retention-days: 14
