@@ -26,6 +26,25 @@ jobs:
           Expand-Archive -LiteralPath $zip -DestinationPath 'source' -Force
           $project = (Resolve-Path 'source/Panoramize_v5.4.0').Path
           if (-not (Test-Path (Join-Path $project 'CMakeLists.txt'))) { throw 'CMakeLists.txt missing in source ZIP' }
+          # Release builds define NDEBUG. Several existing test programs use assert(expr)
+          # for setup, so disabling assert() removes necessary operations and can crash.
+          # Restore assert() ONLY in test executables, not in the production DSP/VST3.
+          $cmakeFile = Join-Path $project 'CMakeLists.txt'
+          $testAssertions = @'
+          # Windows CI: keep test-side assert() active in optimized Release builds.
+          if(MSVC)
+            get_property(_panoramize_ci_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+            foreach(_ci_target IN LISTS _panoramize_ci_targets)
+              if(_ci_target MATCHES "(_test|_smoke)$")
+                get_target_property(_ci_type "${_ci_target}" TYPE)
+                if(_ci_type STREQUAL "EXECUTABLE")
+                  target_compile_options("${_ci_target}" PRIVATE "$<$<CONFIG:Release>:/UNDEBUG>")
+                endif()
+              endif()
+            endforeach()
+          endif()
+          '@
+          Add-Content -LiteralPath $cmakeFile -Value $testAssertions -Encoding utf8
           "PANORAMA_SRC=$project" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Build Windows x64 VST3, run CTest and pluginval strictness 5
