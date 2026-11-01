@@ -1,0 +1,39 @@
+name: Import Panoramize source for GUI development
+on:
+  push:
+    branches: [feature/panoramic-gui]
+    paths:
+      - '.github/workflows/import-gui-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-sources:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Expand original source and commit versioned editable source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $zip = Join-Path $env:GITHUB_WORKSPACE 'Panoramize_v5.4.0_MSVC_Fix1_Source.zip'
+          Expand-Archive -LiteralPath $zip -DestinationPath 'source-original' -Force
+          $project = Join-Path $env:GITHUB_WORKSPACE 'source-original/Panoramize_v5.4.0'
+          if (-not (Test-Path (Join-Path $project 'CMakeLists.txt'))) { throw 'Source CMakeLists missing' }
+          if (Test-Path 'panoramize-src') { Write-Host 'Sources already imported'; exit 0 }
+          New-Item -ItemType Directory -Force -Path 'panoramize-src' | Out-Null
+          Copy-Item -LiteralPath (Join-Path $project '*') -Destination 'panoramize-src' -Recurse -Force
+          # Exclude typical build outputs and downloaded SDK folders if found.
+          foreach ($name in @('build','build-win','windows-validation54','.git','_deps','node_modules')) {
+            Remove-Item -LiteralPath (Join-Path 'panoramize-src' $name) -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- 'panoramize-src'
+          git status --short | Select-Object -First 30 | Out-Host
+          git commit -m 'chore(gui): import editable Panoramize source from original ZIP'
+          git push origin HEAD:feature/panoramic-gui
