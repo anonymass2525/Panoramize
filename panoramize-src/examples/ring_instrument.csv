@@ -1,0 +1,13 @@
+# Variable-size spring ring; 4 bodies shown, edit/add bodies and links as needed
+body,a,1,0,0,0.8,100000,2
+body,b,0,1,0,0.8,120000,2
+body,c,-1,0,0,0.8,130000,2
+body,d,0,-1,0,0.8,150000,2
+spring,0,1,20000,10
+spring,1,2,20000,10
+spring,2,3,20000,10
+spring,3,0,20000,10
+excite,0,0,0,0.13
+excite,1,0.06,0,0.05
+pickup,1,0.3,0,0.7
+pickup,3,0,0.35,0.65

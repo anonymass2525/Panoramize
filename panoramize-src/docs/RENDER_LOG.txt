@@ -1,0 +1,16 @@
+ 1 demos/01_Crystal_Crown.wav peak=0.1697 rms=0.0252
+ 2 demos/02_Silver_Pulse.wav peak=0.2496 rms=0.0325
+ 3 demos/03_Solar_Glass.wav peak=0.1269 rms=0.0190
+ 4 demos/04_Nebula_Bloom.wav peak=0.6520 rms=0.1548
+ 5 demos/05_Algorithmic_Bell.wav peak=0.6942 rms=0.1504
+ 6 demos/06_Fractal_Aurora.wav peak=0.7355 rms=0.1838
+ 7 demos/07_Breathing_Metal.wav peak=0.9441 rms=0.2720
+ 8 demos/08_Glass_Orchard.wav peak=0.9455 rms=0.2066
+ 9 demos/09_Velvet_Strings.wav peak=0.7492 rms=0.2160
+10 demos/10_Astral_Chimes.wav peak=0.7606 rms=0.1660
+11 demos/11_Living_Supersaw.wav peak=0.5510 rms=0.1304
+12 demos/12_Fractal_Tide.wav peak=0.6462 rms=0.1327
+13 demos/13_Solar_Harp.wav peak=0.9432 rms=0.1531
+14 demos/14_Mercury_Veil.wav peak=0.6902 rms=0.1766
+15 demos/15_Paradox_Bells.wav peak=0.7675 rms=0.1628
+16 demos/16_Breathing_Aurora.wav peak=0.6225 rms=0.1307

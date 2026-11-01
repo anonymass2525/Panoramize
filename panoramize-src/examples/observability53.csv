@@ -1,0 +1,3 @@
+condition,rank,parameters,locally_identifiable,warning
+one_recorded_pitch,1,2,0,"Rank deficient: the supplied observations cannot locally distinguish all chosen parameters"
+with_selected_measurement,2,2,1,"Selected measurement closes the local sensitivity rank (not global identification)"
