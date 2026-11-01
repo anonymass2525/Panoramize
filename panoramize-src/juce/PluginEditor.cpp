@@ -39,18 +39,25 @@ void PanoramaEditor::Content::paint(juce::Graphics&g){
   g.setColour(juce::Colour(0xff1b2c48));
  }
 }
-PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),processor(p),unifiedPanel(p){
+PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),processor(p),unifiedPanel(p),dashboard(p){
  setLookAndFeel(&gLook);
  addAndMakeVisible(graphToggle);
+ addAndMakeVisible(standardButton);
+ addAndMakeVisible(advancedButton);
+ addAndMakeVisible(graphButton);
+ addAndMakeVisible(dashboard);
  addAndMakeVisible(unifiedPanel);
+ standardButton.onClick=[this](){selectView(0);};
+ advancedButton.onClick=[this](){selectView(1);};
+ graphButton.onClick=[this](){selectView(2);};
+ // Explicit DSP engine switch: navigating the three GUI views never changes sound.
  graphToggle.onClick=[this](){
    processor.setUniversalEnabled(!processor.isUniversalEnabled());
-   unifiedPanel.setVisible(processor.isUniversalEnabled());
-   viewport.setVisible(!processor.isUniversalEnabled());
-   graphToggle.setButtonText(processor.isUniversalEnabled()?"FACTORY SOUND MODE":"UNIFIED STATE MODE");
+   if(processor.isUniversalEnabled() && viewMode==2)unifiedPanel.refreshFromProcessor();
+   dashboard.refreshEngineMode();
+   graphToggle.setButtonText(processor.isUniversalEnabled()?"ENGINE: UNIFIED  /  USE FACTORY":"ENGINE: FACTORY  /  USE UNIFIED");
  };
- unifiedPanel.setVisible(processor.isUniversalEnabled());
- graphToggle.setButtonText(processor.isUniversalEnabled()?"FACTORY SOUND MODE":"UNIFIED STATE MODE");
+ graphToggle.setButtonText(processor.isUniversalEnabled()?"ENGINE: UNIFIED  /  USE FACTORY":"ENGINE: FACTORY  /  USE UNIFIED");
  subtitle.setText("VA / DIGITAL / MODAL / COUPLED MODES / MODULAR PATCHBAY",juce::dontSendNotification);
  subtitle.setJustificationType(juce::Justification::centredLeft);
  subtitle.setColour(juce::Label::textColourId,juce::Colour(0xff91a7c4));addAndMakeVisible(subtitle);
@@ -86,8 +93,8 @@ PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),proc
  initGraph();
  initModulation();
  viewport.setViewedComponent(&content,false);viewport.setScrollBarsShown(true,false);addAndMakeVisible(viewport);
- viewport.setVisible(!processor.isUniversalEnabled());
- setResizable(true,true);setResizeLimits(760,560,1920,1400);setSize(1130,900);
+ selectView(0);
+ setResizable(true,true);setResizeLimits(1020,700,2300,1500);setSize(1500,965);
  startTimerHz(5);
 }
 void PanoramaEditor::addKnob(const char*id,const char*name){
@@ -101,29 +108,38 @@ void PanoramaEditor::addKnob(const char*id,const char*name){
  knobs.push_back(std::move(k));
 }
 void PanoramaEditor::paint(juce::Graphics&g){
- g.fillAll(juce::Colour(0xff0b1020));
- g.setColour(juce::Colour(0xffe2f4ff));
- g.setFont(juce::Font(juce::FontOptions(30.f,juce::Font::bold)));
- g.drawText("P A N O R A M A I Z E",24,12,getWidth()-48,46,juce::Justification::centredLeft);
- // PANORAMA identity: cyan/gold horizon line, premium dark-graphite surface.
- juce::ColourGradient horizon(juce::Colour(0xff2d8fce),20.f,63.f,
-  juce::Colour(0xffe0ab65),float(getWidth()-24),63.f,false);
- g.setGradientFill(horizon);g.fillRect(24,64,getWidth()-48,2);
- g.setColour(juce::Colour(0xff98a9ba));g.setFont(12.f);
- g.drawText("typeGPT  |  Unified Acoustic State Graph  |  Prototype 2.5.0",24,getHeight()-29,getWidth()-48,20,juce::Justification::centredLeft);
+ g.fillAll(juce::Colour(0xff061316));
+ const int w=getWidth();
+ juce::ColourGradient h(juce::Colour(0xff143b3d),0.f,0.f,juce::Colour(0xff061317),float(w),118.f,false);
+ g.setGradientFill(h);g.fillRect(0,0,w,127);
+ g.setColour(juce::Colour(0xffdffff8));
+ g.setFont(juce::Font(juce::FontOptions(28.f,juce::Font::bold)));
+ g.drawText("P A N O R A M I Z E",24,11,490,43,juce::Justification::centredLeft);
+ g.setColour(juce::Colour(0xff8ad9ca));g.setFont(juce::Font(juce::FontOptions(10.f)));
+ g.drawText("UNIVERSAL SOUND SYNTHESIS ENVIRONMENT",26,52,505,20,juce::Justification::centredLeft);
+ juce::ColourGradient border(juce::Colour(0xff16efd4),20.f,120.f,juce::Colour(0xfff2bf73),float(w-20),120.f,false);
+ g.setGradientFill(border);g.fillRect(18,119,w-36,2);
+ g.setColour(juce::Colour(0xff91b5ae));g.setFont(juce::Font(juce::FontOptions(11.f)));
+ g.drawText("PANORAMIC DESIGN  /  3 UI MODES  /  FACTORY + UNIFIED DSP",20,getHeight()-24,w-40,19,juce::Justification::centredLeft);
 }
 void PanoramaEditor::resized(){
- const int w=getWidth();
- subtitle.setBounds(26,78,w-52,22);
- preset.setBounds(26,109,(w-70)/2,32);
- engine.setBounds(44+(w-70)/2,109,(w-70)/2,32);
- routing.setBounds(26,151,w-450,32);
- importGraphButton.setBounds(w-427,151,195,32);
- graphToggle.setBounds(w-220,151,194,32);
- viewport.setBounds(24,220,w-48,getHeight()-260);
- unifiedPanel.setBounds(24,201,w-48,getHeight()-243);
- const int cw=std::max(700,viewport.getWidth()-14);
- content.setSize(cw,860+5*180+24);
+ const int w=getWidth(),h=getHeight();
+ subtitle.setBounds(26,81,std::max(235,w-850),25);
+ preset.setBounds(std::max(360,w-873),20,290,34);
+ standardButton.setBounds(w-571,20,124,34);
+ advancedButton.setBounds(w-439,20,124,34);
+ graphButton.setBounds(w-307,20,124,34);
+ graphToggle.setBounds(w-322,72,297,35);
+ engine.setBounds(24,143,259,34);
+ routing.setBounds(292,143,270,34);
+ importGraphButton.setBounds(570,143,218,34);
+ dashboard.setBounds(9,130,w-18,h-159);
+ viewport.setBounds(15,216,w-30,h-247);
+ unifiedPanel.setBounds(15,136,w-30,h-167);
+ const int cw0=std::max(700,viewport.getWidth()-14);
+ content.setSize(cw0,860+5*180+24);
+ graphStatus.setBounds(23,184,w-46,22);
+ const int cw=cw0;
  for(int i=0;i<panorama::kGraphNodes;i++){
   auto& r=graphRows[i];const int y=57+i*65;
   r.label->setBounds(19,y+12,61,35);
@@ -151,6 +167,23 @@ void PanoramaEditor::resized(){
  }
 }
 
+void PanoramaEditor::selectView(int mode){
+ viewMode=juce::jlimit(0,2,mode);
+ dashboard.setVisible(viewMode==0);
+ viewport.setVisible(viewMode==1);
+ unifiedPanel.setVisible(viewMode==2);
+ engine.setVisible(viewMode==1);
+ routing.setVisible(viewMode==1);
+ importGraphButton.setVisible(viewMode==1);
+ graphStatus.setVisible(viewMode==1);
+ const juce::Colour active(0xff1c877d),inactive(0xff152e34);
+ standardButton.setColour(juce::TextButton::buttonColourId,viewMode==0?active:inactive);
+ advancedButton.setColour(juce::TextButton::buttonColourId,viewMode==1?active:inactive);
+ graphButton.setColour(juce::TextButton::buttonColourId,viewMode==2?active:inactive);
+ if(viewMode==2)unifiedPanel.refreshFromProcessor();
+ dashboard.refreshEngineMode();
+ resized();
+}
 void PanoramaEditor::initGraph(){
  const juce::StringArray typeNames{"Off","VA Osc","FM Digital","Noise","Ring","Mix","Wavefolder","Modal","Low-pass","Gain","Harmonic Additive","Phase Warp","Coupled Modes","Resonant Exchange","Phase Ecology","Spectral Matter","Matter Weave","Formant Field","Phase-Matter Bridge","Physical Body","Unified Coupler","Mesh Body","Feedback Delay","Passive Body"};
  for(int i=0;i<panorama::kGraphNodes;i++){
@@ -203,12 +236,9 @@ void PanoramaEditor::timerCallback(){
  auto current=processor.getPatchFromParameters();
  const bool valid=panorama::compileGraph(current.graph,order)&&panorama::validateModRoutes(current.graph,current.modRoutes);
  const bool modular=current.engine==panorama::Engine::Modular;
- if(unifiedPanel.isVisible()!=processor.isUniversalEnabled()){
-   unifiedPanel.setVisible(processor.isUniversalEnabled());
-   viewport.setVisible(!processor.isUniversalEnabled());
-   graphToggle.setButtonText(processor.isUniversalEnabled()?"FACTORY SOUND MODE":"UNIFIED STATE MODE");
-   if(processor.isUniversalEnabled())unifiedPanel.refreshFromProcessor();
- }
+ dashboard.refreshEngineMode();
+ graphToggle.setButtonText(processor.isUniversalEnabled()?"ENGINE: UNIFIED  /  USE FACTORY":"ENGINE: FACTORY  /  USE UNIFIED");
+ preset.setEnabled(!processor.isUniversalEnabled());
  graphStatus.setText(modular?(valid?"MODULAR GRAPH: VALID":"MODULAR GRAPH: CYCLE / INVALID AUDIO OR MOD ROUTING - MUTED"):
     "Select Modular Patchbay engine to hear this graph",juce::dontSendNotification);
  graphStatus.setColour(juce::Label::textColourId,valid?juce::Colour(0xff86dcca):juce::Colour(0xffff9292));
