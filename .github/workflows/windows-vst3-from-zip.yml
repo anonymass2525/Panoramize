@@ -18,7 +18,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $zip = Join-Path $env:GITHUB_WORKSPACE 'Panoramize_v5.4.0_Source.zip'
+          $zip = Join-Path $env:GITHUB_WORKSPACE 'Panoramize_v5.4.0_MSVC_Fix1_Source.zip'
           if (-not (Test-Path -LiteralPath $zip)) { throw "Missing source archive: $zip" }
           Expand-Archive -LiteralPath $zip -DestinationPath 'source' -Force
           $project = (Resolve-Path 'source/Panoramize_v5.4.0').Path
