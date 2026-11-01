@@ -6,7 +6,40 @@ public:
   setColour(juce::Slider::rotarySliderFillColourId,juce::Colour(0xff45b0db));
   setColour(juce::ComboBox::backgroundColourId,juce::Colour(0xff19243c));
   setColour(juce::ComboBox::textColourId,juce::Colours::white);
-  setColour(juce::PopupMenu::backgroundColourId,juce::Colour(0xff1a2840));}
+  setColour(juce::PopupMenu::backgroundColourId,juce::Colour(0xff0b2228));
+  setColour(juce::TextButton::textColourOffId,juce::Colour(0xffd3f9ef));
+  setColour(juce::ComboBox::outlineColourId,juce::Colour(0xff32665f));
+  setColour(juce::Label::textColourId,juce::Colour(0xffc4e7e0));
+ }
+ void drawRotarySlider(juce::Graphics&g,int x,int y,int w,int h,
+    float pos,float startAngle,float endAngle,juce::Slider&slider) override {
+  const float diameter=juce::jmin(float(w),float(h))*0.75f;
+  if(diameter<8.f)return;
+  const float cx=x+w*.5f,cy=y+h*.48f,r=diameter*.43f;
+  const float angle=startAngle+pos*(endAngle-startAngle);
+  juce::ColourGradient face(juce::Colour(0xff19413f),cx-r,cy-r,
+                            juce::Colour(0xff09181e),cx+r,cy+r,false);
+  g.setGradientFill(face);g.fillEllipse(cx-r,cy-r,2*r,2*r);
+  g.setColour(juce::Colour(0xff56887d));g.drawEllipse(cx-r,cy-r,2*r,2*r,1.f);
+  const auto accent=slider.findColour(juce::Slider::rotarySliderFillColourId);
+  juce::Path ring;ring.addCentredArc(cx,cy,r+3,r+3,0.f,startAngle,endAngle,true);
+  g.setColour(juce::Colour(0xff315b59));
+  g.strokePath(ring,juce::PathStrokeType(3.3f,juce::PathStrokeType::curved,
+                                       juce::PathStrokeType::rounded));
+  juce::Path active;active.addCentredArc(cx,cy,r+3,r+3,0.f,startAngle,angle,true);
+  g.setColour(accent.withAlpha(.17f));
+  g.strokePath(active,juce::PathStrokeType(7.f,juce::PathStrokeType::curved,
+                                         juce::PathStrokeType::rounded));
+  g.setColour(accent);
+  g.strokePath(active,juce::PathStrokeType(3.4f,juce::PathStrokeType::curved,
+                                         juce::PathStrokeType::rounded));
+  const float in=r*.40f,out=r*.71f;
+  g.setColour(juce::Colour(0xffe6fff8));
+  g.drawLine(cx+std::sin(angle)*in,cy-std::cos(angle)*in,
+             cx+std::sin(angle)*out,cy-std::cos(angle)*out,2.1f);
+  g.setColour(juce::Colour(0xff6bbaa9).withAlpha(.45f));
+  g.fillEllipse(cx-2,cy-2,4.f,4.f);
+ }
 };
 PanoramaLook gLook;
 }
@@ -93,8 +126,8 @@ PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),proc
  initGraph();
  initModulation();
  viewport.setViewedComponent(&content,false);viewport.setScrollBarsShown(true,false);addAndMakeVisible(viewport);
- selectView(0);
  setResizable(true,true);setResizeLimits(1020,700,2300,1500);setSize(1500,965);
+ selectView(0);
  startTimerHz(5);
 }
 void PanoramaEditor::addKnob(const char*id,const char*name){
