@@ -39,6 +39,11 @@ jobs:
                 get_target_property(_ci_type "${_ci_target}" TYPE)
                 if(_ci_type STREQUAL "EXECUTABLE")
                   target_compile_options("${_ci_target}" PRIVATE "$<$<CONFIG:Release>:/UNDEBUG>")
+                  # Synth is ~883 KiB; legacy tests create several Synth/Processor
+                  # locals in a single main() stack frame. Windows default 1 MiB
+                  # stack causes 0xC00000FD (stack overflow) before assertions.
+                  # Only test executables get a larger stack; VST3 is unchanged.
+                  target_link_options("${_ci_target}" PRIVATE "/STACK:67108864")
                 endif()
               endif()
             endforeach()
