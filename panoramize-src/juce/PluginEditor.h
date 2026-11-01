@@ -2,6 +2,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "UniversalGraphEditor23.h"
+#include "PanoramicDashboard.h"
 #include <memory>
 #include <vector>
 class PanoramaEditor final:public juce::AudioProcessorEditor,private juce::Timer {
@@ -42,7 +43,11 @@ private:
  };
  PanoramaProcessor& processor;
  UniversalGraphPanel23 unifiedPanel;
- juce::TextButton graphToggle{"UNIFIED PATCHBAY"};
+ PanoramicDashboard dashboard;
+ int viewMode=0; // 0 Standard, 1 Advanced, 2 Graph: UI-only navigation.
+ juce::TextButton standardButton{"STANDARD"},advancedButton{"ADVANCED"},graphButton{"GRAPH"};
+ void selectView(int mode);
+ juce::TextButton graphToggle{"SWITCH DSP ENGINE"};
  juce::Viewport viewport;
  juce::ComboBox preset,engine,routing;
  juce::TextButton importGraphButton{"LOAD INVERSE GRAPH"};
