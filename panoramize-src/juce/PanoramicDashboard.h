@@ -104,6 +104,7 @@ public:
   panel(g,359,111,830,305);
   txt(g,"PANORAMIC SOUND ENGINE",375,122,480,21,17,juce::Colour(0xffe8fcf6),true);
   labelChip(g,965,120,106,"LANDSCAPE");labelChip(g,1078,120,94,"ENERGY");
+  {
   juce::Graphics::ScopedSaveState vizSave(g);
   g.reduceClipRegion(juce::Rectangle<int>(367,151,812,231));
   juce::ColourGradient bg(juce::Colour(0xff091e2a),768.f,150.f,juce::Colour(0xff102e2b),768.f,390.f,false);
@@ -138,6 +139,7 @@ public:
    g.setColour(juce::Colour(0xff0d3739));g.fillEllipse(cx-17,cy-17,34.f,34.f);
    g.setColour(juce::Colour(i%2?0xffefc882:0xff5debd2));g.drawEllipse(cx-17,cy-17,34.f,34.f,1.6f);
    g.fillEllipse(cx-3,cy-3,6.f,6.f);
+  }
   }
   txt(g,"VISUAL MOTIF  •  NOT A LIVE SPECTRUM ANALYSER",375,383,785,24,11,juce::Colour(0xff98bab6));
   // Graph diagram, schematic only.
@@ -189,7 +191,7 @@ private:
  std::vector<std::unique_ptr<Control>> controls;
  juce::ComboBox engine;
  std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> engineAttachment;
- bool lastFactory=false;
+ bool lastFactory=true;
  static void txt(juce::Graphics&g,const juce::String&s,float x,float y,float w,float h,float size,juce::Colour c,bool bold=false) {
   g.setColour(c);g.setFont(juce::Font(juce::FontOptions(size,bold?juce::Font::bold:juce::Font::plain)));
   g.drawFittedText(s,juce::Rectangle<int>(juce::roundToInt(x),juce::roundToInt(y),
