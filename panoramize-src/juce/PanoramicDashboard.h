@@ -20,7 +20,7 @@ public:
                             "CUTOFF","RESONANCE","ATTACK","DECAY","SUSTAIN","RELEASE","BODY","DAMPING",
                             "CROSS DEPTH","STEREO WIDTH"};
   // Coordinates are expressed in a 1500 x 795 logical surface.
-  const int x[] = { 98,274,450,626,802,978,1154,1330, 399,496,636,718,800,882,965,1044,1218,1371 };
+  const int x[] = { 196,358,520,682,844,1006,1168,1330, 393,490,608,682,756,830,965,1044,1218,1371 };
   const int y[] = { 18,18,18,18,18,18,18,18, 478,478,478,478,478,478,478,478,487,487 };
   const int w[] = { 92,92,92,92,92,92,92,92, 84,84,72,72,72,72,72,72,106,106 };
   for (int i=0;i<18;++i) {
@@ -81,10 +81,10 @@ public:
    ribbon.cubicTo(180.f,600.f+i*11.f,220.f,835.f-i*8.f,370.f,745.f+i*3.f);
    g.setColour(juce::Colour(0xff14dbc4).withAlpha(.07f));g.strokePath(ribbon,juce::PathStrokeType(1.f));
   }
-  panel(g,12,7,1476,92);txt(g,"MACRO CONTROLS",24,22,190,22,13,juce::Colour(0xffdef8ef),true);
-  line(g,195,22,195,83,juce::Colour(0xff28505a),1.f);
+  panel(g,12,7,1476,92);txt(g,"MACRO CONTROLS",24,22,151,22,13,juce::Colour(0xffdef8ef),true);
+  line(g,174,22,174,83,juce::Colour(0xff28505a),1.f);
   const char* macroNames[]={"M1 • TONE","M2 • RESONANCE","M3 • FM","M4 • BLEND","M5 • DETUNE","M6 • MOTION","M7 • EXCITER","M8 • GAIN"};
-  for(int i=0;i<8;i++)txt(g,macroNames[i],205.f+i*175.f,74.f,170,18,10,juce::Colour(0xff9bd5cf));
+  for(int i=0;i<8;i++)txt(g,macroNames[i],180.f+i*162.f,74.f,155,18,10,juce::Colour(0xff9bd5cf));
   // Left source panel: one factory DSP engine selection, not invented oscillator slots.
   panel(g,12,111,336,305);
   txt(g,"SOUND SOURCES",29,123,290,21,16,juce::Colour(0xffe2fcf5),true);
