@@ -1,6 +1,9 @@
 name: Panoramize 5.4 - Windows VST3 from source ZIP
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
