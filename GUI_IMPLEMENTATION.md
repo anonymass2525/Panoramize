@@ -1,6 +1,6 @@
 # Panoramize Panoramic GUI — implementation and acceptance
 
-Status: GUI implementation committed on `feature/panoramic-gui`; validation is reported by [Windows GUI CI](https://github.com/anonymass2525/Panoramize/actions/workflows/panoramic-gui-ci.yml). No claim of Studio One acceptance until a human runs it.
+Status: GUI implemented on `feature/panoramic-gui`. Windows x64 Release build, CTest 46/46 and pluginval strictness 5 PASSED on commit `6dc693b9a4ada10d7147aa262e03854d9e190145`, [CI run #41349398095](https://github.com/anonymass2525/Panoramize/actions/runs/41349398095). Studio One acceptance remains pending.
 
 ## Three modes (UI navigation only)
 - **Standard:** vector-rendered panoramic sound landscape, schematic state graph, factory DSP parameter knobs and factory engine selector.
@@ -31,8 +31,8 @@ Illustrative / **not functional DSP visualizers yet**:
 - Revert by running the existing main-branch VST3 artifact or reverting the GUI branch; do not overwrite the installed working plugin without a backup.
 
 ## Acceptance checklist
-- [ ] Clean Windows x64 MSVC Release build (see CI run)
-- [ ] CTest and pluginval strictness 5 (see CI run)
+- [x] Clean Windows x64 MSVC Release build ([CI run #41349398095](https://github.com/anonymass2525/Panoramize/actions/runs/41349398095))
+- [x] CTest 46/46 and pluginval strictness 5 ([CI run #41349398095](https://github.com/anonymass2525/Panoramize/actions/runs/41349398095))
 - [ ] Studio One loads the new VST3 and saves/reloads a session
 - [ ] Standard/Advanced/Graph switches without dropping held notes unexpectedly
 - [ ] Factory knob changes and automation audibly affect Factory DSP; Unified knob disable is evident
