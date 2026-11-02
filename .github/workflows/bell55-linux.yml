@@ -30,4 +30,4 @@ jobs:
           name: Panoramize-Bell55-Dry-Audio-Previews-Linux
           path: bell55-previews/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 90
