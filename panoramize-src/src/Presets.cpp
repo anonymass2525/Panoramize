@@ -31,6 +31,11 @@ const std::array<Patch,kPresetCount>& factoryPresets(){
  {"23 / Static Cathedral",Engine::Modular,.91f,.14f,.72f,1.12f,.79f,2.12f,.08f,.21f,.88f,.46f,.86f,.35f,.92f,.62f,.82f,.45f},
  {"24 / Prismatic Organism",Engine::Modular,.95f,.12f,.02f,1.21f,.61f,1.49f,.28f,.68f,.73f,.74f,.96f,.14f,.71f,.84f,.97f,.50f},
  }};
+ // v5.5: deliberately evolve the fifth factory bell: Fractal Digital exciter
+ // plus a parallel inharmonic, energy-decaying modal body (editable from UI).
+ // metalMix=0 on earlier sessions restores the original sample path.
+ v[4].metalMix=.57f;v[4].metalColor=.66f;v[4].metalDecay=.75f;
+ v[4].stereoResonance=.24f;
  // v0.4: reimagined additive and phase-warp sound design; these are deliberately
  // not required to resemble the v0.1 VA/legacy factory sounds.
  v[24]={"25 / Midnight Geometry Reforged",Engine::Modular,.88f,.15f,.045f,.65f,.69f,1.1f,.23f,.55f,.59f,.52f,.83f,.26f,.52f,.53f,.84f,.48f};

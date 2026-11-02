@@ -85,7 +85,7 @@ void PanoramaEditor::Content::paint(juce::Graphics&g){
  g.setColour(juce::Colour(0xffdffcf4));g.setFont(juce::Font(juce::FontOptions(17.f,juce::Font::bold)));
  g.drawText("GLOBAL SOUND CONTROLS",20,820,getWidth()-40,30,juce::Justification::centredLeft);
  g.setColour(juce::Colour(0xff102b30));
- for(int row=0;row<5;row++){
+ for(int row=0;row<6;row++){
   auto bounds=juce::Rectangle<float>(12.f,(float)knobTop+row*180.f,(float)getWidth()-24.f,172.f);
   g.fillRoundedRectangle(bounds,12.f);
   g.setColour(juce::Colour(0xff2f655e));g.drawRoundedRectangle(bounds,12.f,1.f);
@@ -145,6 +145,8 @@ PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),proc
  addKnob("body","RESONATOR BODY");addKnob("damping","DAMPING");addKnob("motion","MOTION");addKnob("blend","HYBRID MIX");
  addKnob("brightness","EXCITER BRIGHTNESS");addKnob("gain","MASTER GAIN");
  addKnob("crossDepth","ROUTING DEPTH");addKnob("stereoResonance","RESONATOR WIDTH");
+ addKnob("metalMix","BELL METAL BODY");addKnob("metalColor","METALLIC COLOR");
+ addKnob("metalDecay","BELL TAIL / NEXT NOTE");
  initGraph();
  initModulation();
  viewport.setViewedComponent(&content,false);viewport.setScrollBarsShown(true,false);addAndMakeVisible(viewport);
@@ -157,6 +159,8 @@ void PanoramaEditor::addKnob(const char*id,const char*name){
  k.label->setJustificationType(juce::Justification::centred);k.label->setColour(juce::Label::textColourId,juce::Colour(0xffb9e1d7));
  k.slider=std::make_unique<juce::Slider>();k.slider->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
  k.slider->setTextBoxStyle(juce::Slider::TextBoxBelow,false,84,20);
+ if(juce::String(id)=="metalDecay")k.slider->setTooltip("Decay is applied when a NEW note is struck. Existing resonances finish naturally.");
+ if(juce::String(id)=="metalMix")k.slider->setTooltip("0: original Fractal Digital sound. 1: stronger parallel inharmonic metallic body.");
  k.slider->setColour(juce::Slider::textBoxTextColourId,juce::Colours::white);
  k.attachment=std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processor.params,id,*k.slider);
  content.addAndMakeVisible(*k.label);content.addAndMakeVisible(*k.slider);
@@ -192,7 +196,7 @@ void PanoramaEditor::resized(){
  viewport.setBounds(15,216,w-30,h-247);
  unifiedPanel.setBounds(15,136,w-30,h-167);
  const int cw0=std::max(700,viewport.getWidth()-14);
- content.setSize(cw0,860+5*180+24);
+ content.setSize(cw0,860+6*180+24);
  graphStatus.setBounds(23,184,w-46,22);
  const int cw=cw0;
  for(int i=0;i<panorama::kGraphNodes;i++){
