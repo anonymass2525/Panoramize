@@ -22,15 +22,15 @@ public:
   selector_.onChange=[this]{syncSelection();};
   value_.onDragEnd=[this]{commit();};
   value_.onValueChange=[this]{if(!value_.isMouseButtonDown())commit();};
-  info_.setColour(juce::Label::textColourId,juce::Colours::lightblue);
+  info_.setColour(juce::Label::textColourId,juce::Colour(0xff65e4cf));
  }
  void setGraph(const Graph&g){
   graph_=g;parameters_=panorama::controls50::catalog(graph_);
   rebuildOptions();
  }
  void paint(juce::Graphics&g)override{
-  g.fillAll(juce::Colour(0xff111f32));
-  g.setColour(juce::Colours::lightblue);g.setFont(16.f);
+  g.fillAll(juce::Colour(0xff0b2227));
+  g.setColour(juce::Colour(0xff65e4cf));g.setFont(16.f);
   g.drawText("UNIFIED DSP CONTROL INSPECTOR / 5.2",15,10,getWidth()-30,30,juce::Justification::centredLeft);
   g.setFont(12.f);g.drawText("Host-safe controls update live; complex DSP and FEM parameters require graph recompilation.",15,45,getWidth()-25,23,juce::Justification::centredLeft);
  }

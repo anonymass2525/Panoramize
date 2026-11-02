@@ -10,7 +10,7 @@ public:
   addAndMakeVisible(heading);
   heading.setText("PHYSICAL ARTICULATION | STRING / FRETS / CONTACT",juce::dontSendNotification);
   heading.setFont(juce::Font(juce::FontOptions(19.f,juce::Font::bold)));
-  heading.setColour(juce::Label::textColourId,juce::Colour(0xffd7f6ff));
+  heading.setColour(juce::Label::textColourId,juce::Colour(0xffe4fff4));
   constexpr const char* captions[]={"HAMMER CONTACT IMPULSE","PULL RELEASE IMPULSE","SLIDE FRICTION","PALM CONTACT LOSS / s","PALM POSITION / LENGTH","LEGATO GLIDE / ms","VELOCITY -> PICK","PRESSURE -> DAMP","BODY RESONANCE MIX"};
   constexpr double minv[]={0,0,0,0,.70,0,0,0,0};
   constexpr double maxv[]={2,2,2,600,.99,250,.5,180,1};
@@ -18,7 +18,7 @@ public:
    auto&l=labels[size_t(i)];auto&sl=sliders[size_t(i)];
    addAndMakeVisible(l);addAndMakeVisible(sl);
    l.setText(captions[i],juce::dontSendNotification);
-   l.setColour(juce::Label::textColourId,juce::Colour(0xff9ac1da));
+   l.setColour(juce::Label::textColourId,juce::Colour(0xffa8d7ce));
    sl.setRange(minv[i],maxv[i],.001);
    sl.setSliderStyle(juce::Slider::LinearHorizontal);
    sl.setTextBoxStyle(juce::Slider::TextBoxRight,false,65,22);
@@ -45,9 +45,9 @@ public:
   }
  }
  void paint(juce::Graphics&g)override{
-  g.fillAll(juce::Colour(0xff0c1424));
-  g.setColour(juce::Colour(0xff203852));g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(3.f),10.f,1.f);
-  g.setColour(juce::Colour(0xff9bb5cf));g.setFont(12.f);
+  g.fillAll(juce::Colour(0xff081c20));
+  g.setColour(juce::Colour(0xff315a51));g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(3.f),10.f,1.f);
+  g.setColour(juce::Colour(0xffb5d3c7));g.setFont(12.f);
   g.drawFittedText("CC20 transition: legato / hammer / pull / slide | CC21 impulse | CC22 palm depth | CC23 palm position",20,405,getWidth()-40,34,juce::Justification::centredLeft,2);
   g.drawFittedText("Physical modal-contact approximation; not a 3D collision solver.",20,443,getWidth()-40,25,juce::Justification::centredLeft,1);
  }

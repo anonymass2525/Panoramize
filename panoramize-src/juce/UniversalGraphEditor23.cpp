@@ -6,13 +6,15 @@ using namespace panorama::universal23;
 const juce::StringArray names{"FACTORY SOUND", "UNIFIED STATE", "MIX A/B", "GAIN", "FOLD", "1-SAMPLE DELAY", "OUTPUT", "STATE -> FORCE", "STATE -> FACTORY (z^-1)", "NATIVE 2.6 / PRESET", "DIRECT STATE 2.7 / EDITABLE", "PHYSICAL GUITAR / INVERSE 2.9", "COUPLED PHYSICAL / INVERSE 3.0", "EXPRESSIVE PHYSICAL / 3.2", "ARTICULATED PHYSICAL / 3.3", "SPATIAL STRING CONTACT / 3.4", "SIX STRING FEM / 3.5", "UNIFIED PHYSICAL / ACOUSTIC 3.9", "ENERGY PORTS / IMPLICIT 4.0", "SI BOUNDARY FEM / 4.1", "SPARSE PORT HAMILTONIAN / 4.2", "SPARSE SPECTRAL + IC0 / 4.3", "BOUNDARY-REDUCED MULTIRATE / 4.4", "NONLINEAR CONTACT + NATIVE PROXY / 4.5", "GENUINE NATIVE27 / QUALITY 4.7"};
 }
 void UniversalGraphPanel23::ListContent::paint(juce::Graphics& g){
- g.fillAll(juce::Colour(0xff090f1d));
+ g.fillAll(juce::Colour(0xff061316));
  for(int i=0;i<getHeight()/64;i++){
   const auto y=14.f+float(i*64);
-  g.setColour(juce::Colour(i%2==0?0xff152337:0xff111b2b));
+  g.setColour(juce::Colour(i%2==0?0xff123033:0xff0c2229));
   g.fillRoundedRectangle(8.f,y,float(getWidth()-16),57.f,8.f);
-  g.setColour(juce::Colour(0xff314d65));g.drawRoundedRectangle(8.f,y,float(getWidth()-16),57.f,8.f,1.f);
-  g.setColour(juce::Colour(0xff327eac));g.fillRoundedRectangle(9.f,y+4.f,3.f,49.f,1.5f);
+  g.setColour(juce::Colour(0xff2a615b));g.drawRoundedRectangle(8.f,y,float(getWidth()-16),57.f,8.f,1.f);
+  g.setColour(juce::Colour(0xff32d3be));g.fillRoundedRectangle(9.f,y+4.f,3.f,49.f,1.5f);
+  g.setColour(juce::Colour(0xff6cead5).withAlpha(.12f));
+  g.drawLine(18.f,y+1.f,float(getWidth()-19),y+1.f,1.f);
  }
 }
 UniversalGraphPanel23::UniversalGraphPanel23(PanoramaProcessor& p):processor(p){
@@ -186,7 +188,7 @@ UniversalGraphPanel23::UniversalGraphPanel23(PanoramaProcessor& p):processor(p){
   stateButton.setButtonText(show?"BACK TO PATCHBAY":"EDIT ACOUSTIC STATE");
   if(!show)refreshFromProcessor();resized();
  };
- status.setColour(juce::Label::textColourId,juce::Colour(0xff9bd1ea));
+ status.setColour(juce::Label::textColourId,juce::Colour(0xffa5e8dc));
  status.setFont(juce::Font(juce::FontOptions(13.f)));
  viewport.setViewedComponent(&content,false);viewport.setScrollBarsShown(true,false);addAndMakeVisible(viewport);
  addButton.onClick=[this](){
@@ -291,7 +293,7 @@ void UniversalGraphPanel23::rebuildRows(){
   auto row=std::make_unique<Row>();
   row->label=std::make_unique<juce::Label>();
   row->label->setText(juce::String(i+1).paddedLeft('0',2),juce::dontSendNotification);
-  row->label->setColour(juce::Label::textColourId,juce::Colour(0xff7cc7ed));
+  row->label->setColour(juce::Label::textColourId,juce::Colour(0xff43e6c9));
   content.addAndMakeVisible(*row->label);
   row->kind=std::make_unique<juce::ComboBox>();
   for(int t=0;t<names.size();t++)row->kind->addItem(names[t],t+1);
@@ -369,14 +371,17 @@ void UniversalGraphPanel23::changed(int i){
  }
 }
 void UniversalGraphPanel23::paint(juce::Graphics&g){
- g.fillAll(juce::Colour(0xff0a1421));
- juce::ColourGradient gradient(juce::Colour(0xff172c44),0.f,0.f,
-      juce::Colour(0xff0b1726),0.f,float(getHeight()),false);
+ g.fillAll(juce::Colour(0xff061316));
+ juce::ColourGradient gradient(juce::Colour(0xff153739),0.f,0.f,
+      juce::Colour(0xff07191e),0.f,float(getHeight()),false);
  g.setGradientFill(gradient);g.fillRect(getLocalBounds());
- g.setColour(juce::Colour(0xffe6f5ff));g.setFont(juce::Font(juce::FontOptions(20.f,juce::Font::bold)));
+ g.setColour(juce::Colour(0xffe4fff7));g.setFont(juce::Font(juce::FontOptions(20.f,juce::Font::bold)));
  g.drawText("PANORAMIZE | UNIFIED ACOUSTIC PATCHBAY",18,9,getWidth()-30,35,juce::Justification::centredLeft);
- g.setColour(juce::Colour(0xff8fbcd4));g.setFont(12.f);
+ g.setColour(juce::Colour(0xffa4cdc4));g.setFont(12.f);
  g.drawText("DIRECT STATE DESIGN / 72 FACTORY SOUNDS / ENERGY LINKS / SESSION SAVE",18,43,getWidth()-30,24,juce::Justification::centredLeft);
+ juce::ColourGradient accent(juce::Colour(0xff22dfc3),18.f,72.f,
+                             juce::Colour(0xfff2c47b),float(getWidth()-20),72.f,false);
+ g.setGradientFill(accent);g.fillRoundedRectangle(18.f,72.f,float(getWidth()-36),1.7f,.8f);
 }
 void UniversalGraphPanel23::resized(){
  const int width=getWidth();const int y=78;

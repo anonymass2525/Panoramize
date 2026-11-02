@@ -12,7 +12,7 @@ public:
   addAndMakeVisible(heading);
   heading.setText("PANORAMIZE | SPATIAL STRING / CONTACT DYNAMICS",juce::dontSendNotification);
   heading.setFont(juce::Font(juce::FontOptions(20.f,juce::Font::bold)));
-  heading.setColour(juce::Label::textColourId,juce::Colour(0xffc6edff));
+  heading.setColour(juce::Label::textColourId,juce::Colour(0xffe0fff5));
   constexpr const char* names[]={"OPEN STRING / Hz","STRING LOSS / s","FINGER CLAMP STIFFNESS","FRETBOARD GAP","BRIDGE RESONANCE / Hz","BODY X RESONANCE / Hz","BODY Y RESONANCE / Hz","BODY Z RESONANCE / Hz","BRIDGE-BODY COUPLING","PALM CONTACT LOSS / s","SLIDE FRICTION","FRETTING GLIDE / ms"};
   constexpr double minv[]={35,0,.1,.000001,30,20,20,20,0,0,0,2};
   constexpr double maxv[]={400,200,12,.01,1100,800,800,800,1,1000,1,1000};
@@ -20,7 +20,7 @@ public:
    auto&label=labels[size_t(i)];auto&slider=sliders[size_t(i)];
    addAndMakeVisible(label);addAndMakeVisible(slider);
    label.setText(names[i],juce::dontSendNotification);
-   label.setColour(juce::Label::textColourId,juce::Colour(0xff9fcbe3));
+   label.setColour(juce::Label::textColourId,juce::Colour(0xffa6dad0));
    slider.setRange(minv[i],maxv[i],i==3?.000001:.001);
    slider.setSliderStyle(juce::Slider::LinearHorizontal);
    slider.setTextBoxStyle(juce::Slider::TextBoxRight,false,66,22);
@@ -40,9 +40,9 @@ public:
   }
  }
  void paint(juce::Graphics&g)override{
-  g.fillAll(juce::Colour(0xff081424));
-  g.setColour(juce::Colour(0xff4ba2ce));g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(3.f),11.f,1.f);
-  g.setColour(juce::Colour(0xff99b8cb));g.setFont(12.f);
+  g.fillAll(juce::Colour(0xff071b20));
+  g.setColour(juce::Colour(0xff2bd7bd));g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(3.f),11.f,1.f);
+  g.setColour(juce::Colour(0xffa8cfc7));g.setFont(12.f);
   g.drawFittedText("SPATIAL STRING (40 DOF)  /  MOVING FINGER CONTACT  /  UNILATERAL FRET  /  RECIPROCAL BRIDGE + 3-AXIS BODY",16,446,getWidth()-32,25,juce::Justification::centredLeft,1);
  }
 private:

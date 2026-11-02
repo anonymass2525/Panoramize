@@ -12,7 +12,7 @@ public:
   addAndMakeVisible(heading);
   heading.setText("PANORAMIZE | SIX-STRING COUPLED 3D SOUNDBOARD",juce::dontSendNotification);
   heading.setFont(juce::Font(juce::FontOptions(20.f,juce::Font::bold)));
-  heading.setColour(juce::Label::textColourId,juce::Colour(0xffc6edff));
+  heading.setColour(juce::Label::textColourId,juce::Colour(0xffe0fff5));
   constexpr const char* names[]={"STRING LOSS / s","AXIAL / TRANSVERSE RATIO","TORSION / TRANSVERSE RATIO",
    "FRETBOARD GAP","FRET CONTACT STIFFNESS","FRET FRICTION","FINGER STIFFNESS",
    "PALM CONTACT DAMPING","SOUNDBOARD YOUNG / Pa","SOUNDBOARD DENSITY","SOUNDBOARD LOSS",
@@ -22,7 +22,7 @@ public:
   for(int i=0;i<15;i++){
    addAndMakeVisible(labels[size_t(i)]);addAndMakeVisible(sliders[size_t(i)]);
    labels[size_t(i)].setText(names[i],juce::dontSendNotification);
-   labels[size_t(i)].setColour(juce::Label::textColourId,juce::Colour(0xff96c8e4));
+   labels[size_t(i)].setColour(juce::Label::textColourId,juce::Colour(0xffb4d8cd));
    auto& slider=sliders[size_t(i)];slider.setRange(lo[i],hi[i],0);slider.setSkewFactorFromMidPoint((lo[i]+hi[i])*.5);
    slider.setSliderStyle(juce::Slider::LinearHorizontal);
    slider.setTextBoxStyle(juce::Slider::TextBoxRight,false,90,22);
@@ -46,7 +46,7 @@ public:
   }
  }
  void paint(juce::Graphics&g)override{
-  g.fillAll(juce::Colour(0xff071525));g.setColour(juce::Colour(0xff397eaa));
+  g.fillAll(juce::Colour(0xff06191c));g.setColour(juce::Colour(0xff2fa894));
   g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(3),10,1);
  }
 private:

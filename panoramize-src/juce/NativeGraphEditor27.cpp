@@ -9,7 +9,7 @@ constexpr int rowHeight=62;
 NativeGraphEditor27::NativeGraphEditor27(PanoramaProcessor& p):processor(p){
  addAndMakeVisible(addMode);addAndMakeVisible(removeMode);addAndMakeVisible(addEdge);addAndMakeVisible(removeEdge);
  addAndMakeVisible(status);addAndMakeVisible(strike);
- status.setColour(juce::Label::textColourId,juce::Colour(0xffa6d5e5));
+ status.setColour(juce::Label::textColourId,juce::Colour(0xffb6dfd4));
  strike.onChange=[this](){if(updating)return;state.strikeMode=strike.getSelectedId()-1;apply();};
  viewport.setViewedComponent(&content,false);viewport.setScrollBarsShown(true,true);addAndMakeVisible(viewport);
  addMode.onClick=[this](){
@@ -34,17 +34,17 @@ NativeGraphEditor27::NativeGraphEditor27(PanoramaProcessor& p):processor(p){
  refresh();
 }
 void NativeGraphEditor27::Content::paint(juce::Graphics& g){
- g.fillAll(juce::Colour(0xff0c1829));
+ g.fillAll(juce::Colour(0xff07191e));
  const int edgeStart=38+modeCount*rowHeight+50;
  g.setFont(juce::Font(juce::FontOptions(11.f,juce::Font::bold)));
- g.setColour(juce::Colour(0xff9bc8dc));
+ g.setColour(juce::Colour(0xffa0d3c7));
  g.drawText("ENGINE",50,9,165,22,juce::Justification::centredLeft);
  g.drawText("PITCH RATIO",219,9,175,22,juce::Justification::centredLeft);
  g.drawText("DAMPING",398,9,175,22,juce::Justification::centredLeft);
  g.drawText("NONLINEAR",577,9,175,22,juce::Justification::centredLeft);
  g.drawText("PICKUP",756,9,165,22,juce::Justification::centredLeft);
  g.drawText("ACTIVE EFFORT",922,9,180,22,juce::Justification::centredLeft);
- g.setColour(juce::Colour(0xffe9cf98));
+ g.setColour(juce::Colour(0xfff4c783));
  g.drawText("COUPLING: SOURCE",51,edgeStart-30,149,22,juce::Justification::centredLeft);
  g.drawText("DESTINATION",200,edgeStart-30,140,22,juce::Justification::centredLeft);
  g.drawText("ENERGY LAW",352,edgeStart-30,154,22,juce::Justification::centredLeft);
@@ -52,14 +52,14 @@ void NativeGraphEditor27::Content::paint(juce::Graphics& g){
  g.drawText("RATIO",821,edgeStart-30,170,22,juce::Justification::centredLeft);
  for(int i=0;i<modeCount+edgeCount;i++){
   const float y=float(i<modeCount?38+i*rowHeight:edgeStart+(i-modeCount)*rowHeight);
-  g.setColour(juce::Colour((i&1)?0xff11243a:0xff142a3e));
+  g.setColour(juce::Colour((i&1)?0xff0f2b2c:0xff163537));
   g.fillRoundedRectangle(8.f,y-6.f,float(getWidth()-16),50.f,7.f);
  }
 }
 void NativeGraphEditor27::configureSlider(juce::Slider& s,double min,double max,double interval){
  s.setRange(min,max,interval);s.setSliderStyle(juce::Slider::LinearHorizontal);
  s.setTextBoxStyle(juce::Slider::TextBoxRight,false,72,20);
- s.setColour(juce::Slider::trackColourId,juce::Colour(0xff327f9c));
+ s.setColour(juce::Slider::trackColourId,juce::Colour(0xff2ca895));
 }
 void NativeGraphEditor27::refresh(){state=processor.universalGraph().instrument;rebuild();}
 void NativeGraphEditor27::apply(){
@@ -100,7 +100,7 @@ void NativeGraphEditor27::rebuild(){
  for(size_t i=0;i<state.modes.size();i++){
   auto row=std::make_unique<ModeRow>();const auto& mode=state.modes[i];
   row->title=std::make_unique<juce::Label>();row->title->setText("M"+juce::String(int(i)+1),juce::dontSendNotification);
-  row->title->setColour(juce::Label::textColourId,juce::Colour(0xff7adce9));content.addAndMakeVisible(*row->title);
+  row->title->setColour(juce::Label::textColourId,juce::Colour(0xff4ce3c6));content.addAndMakeVisible(*row->title);
   row->engine=std::make_unique<juce::ComboBox>();
   for(int k=0;k<8;k++)row->engine->addItem(kEngineNames[k],k+1);
   row->engine->setSelectedId(int(mode.engine)+1,juce::dontSendNotification);content.addAndMakeVisible(*row->engine);
@@ -120,7 +120,7 @@ void NativeGraphEditor27::rebuild(){
  for(size_t i=0;i<state.edges.size();i++){
   auto row=std::make_unique<EdgeRow>();const auto& e=state.edges[i];
   row->title=std::make_unique<juce::Label>();row->title->setText("E"+juce::String(int(i)+1),juce::dontSendNotification);
-  row->title->setColour(juce::Label::textColourId,juce::Colour(0xffe6c58a));content.addAndMakeVisible(*row->title);
+  row->title->setColour(juce::Label::textColourId,juce::Colour(0xffeac282));content.addAndMakeVisible(*row->title);
   row->a=std::make_unique<juce::ComboBox>();row->b=std::make_unique<juce::ComboBox>();
   for(int k=0;k<int(state.modes.size());k++){
    const auto label="MODE "+juce::String(k+1);row->a->addItem(label,k+1);row->b->addItem(label,k+1);
@@ -144,13 +144,16 @@ void NativeGraphEditor27::rebuild(){
  updating=false;resized();content.repaint();
 }
 void NativeGraphEditor27::paint(juce::Graphics& g){
- g.fillAll(juce::Colour(0xff0b1625));
- auto header=juce::ColourGradient(juce::Colour(0xff244260),0,0,juce::Colour(0xff101c2d),0,120,false);
+ g.fillAll(juce::Colour(0xff061316));
+ auto header=juce::ColourGradient(juce::Colour(0xff1e4943),0,0,juce::Colour(0xff0b1f23),0,120,false);
  g.setGradientFill(header);g.fillRect(0,0,getWidth(),128);
- g.setColour(juce::Colour(0xffeef9ff));g.setFont(juce::Font(juce::FontOptions(19.f,juce::Font::bold)));
+ g.setColour(juce::Colour(0xffe4fff7));g.setFont(juce::Font(juce::FontOptions(19.f,juce::Font::bold)));
  g.drawText("DIRECT ACOUSTIC STATE  /  INSTRUMENT DESIGN",18,7,getWidth()-25,28,juce::Justification::centredLeft);
- g.setColour(juce::Colour(0xff87b8d1));g.setFont(juce::Font(juce::FontOptions(12.f)));
+ g.setColour(juce::Colour(0xff9fcec3));g.setFont(juce::Font(juce::FontOptions(12.f)));
  g.drawText("VA / FM active input  ·  Spectral / Phase / Resonance / Physical / Vocal / Nonlinear  ·  JOINT SOLVER",18,36,getWidth()-25,22,juce::Justification::centredLeft);
+ juce::ColourGradient accent(juce::Colour(0xff30e6ce),16.f,62.f,
+                             juce::Colour(0xffedbd78),float(getWidth()-16),62.f,false);
+ g.setGradientFill(accent);g.fillRoundedRectangle(16.f,62.f,float(getWidth()-32),1.5f,.75f);
 
 }
 void NativeGraphEditor27::resized(){

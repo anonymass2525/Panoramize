@@ -25,7 +25,7 @@ public:
   const char*labels[]={"Cutoff", "Resonance / Q", "Drive", "Output", "Wet/Dry", "Physical monitor", "Native monitor", "VA powered effort", "FM powered effort", "Vocal modal damping", "Nonlinear quartic", "Macro 1", "Macro 2", "Macro 3", "Macro 4"};
   for(int i=0;i<15;i++){
    auto l=std::make_unique<juce::Label>();l->setText(labels[i],juce::dontSendNotification);
-   l->setColour(juce::Label::textColourId,juce::Colours::lightblue);addAndMakeVisible(*l);labels_.push_back(std::move(l));
+   l->setColour(juce::Label::textColourId,juce::Colour(0xff65e4cf));addAndMakeVisible(*l);labels_.push_back(std::move(l));
   }
   for(int i=0;i<4;i++){
    auto&route=route_[size_t(i)];addAndMakeVisible(route.source);addAndMakeVisible(route.target);
@@ -36,7 +36,7 @@ public:
    for(int k=0;k<6;k++)route.target.addItem(targetNames_[size_t(k)],k+1);
    route.source.onChange=[this]{commit();};route.target.onChange=[this]{commit();};route.depth.onDragEnd=[this]{commit();};
   }
-  addAndMakeVisible(description_);description_.setColour(juce::Label::textColourId,juce::Colours::lightgrey);
+  addAndMakeVisible(description_);description_.setColour(juce::Label::textColourId,juce::Colour(0xffaccec5));
   description_.setText("Native27 original oscillator + native modes. VA/FM are powered; modal coupling is conservative/dissipative. PCM filter is NOT a power port.",juce::dontSendNotification);
   setRecipe(panorama::genuine47::example());
  }
@@ -57,8 +57,8 @@ public:
   }
   refreshing_=false;
  }
- void paint(juce::Graphics&g)override{g.fillAll(juce::Colour(0xff0c1422));
-  g.setColour(juce::Colours::lightblue);g.setFont(18.f);
+ void paint(juce::Graphics&g)override{g.fillAll(juce::Colour(0xff091b21));
+  g.setColour(juce::Colour(0xff65e4cf));g.setFont(18.f);
   g.drawText("GENUINE NATIVE27  |  GLOBAL MODULATION & TONE",15,8,getWidth()-30,30,juce::Justification::centredLeft);
   g.setFont(12.f);g.drawText("4 mod routes: source / destination / depth",20, getHeight()-185,getWidth()-40,22,juce::Justification::centredLeft);
  }

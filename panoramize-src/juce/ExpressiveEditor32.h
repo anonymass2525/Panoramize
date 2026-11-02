@@ -11,7 +11,7 @@ public:
  ExpressiveEditor32(){
   addAndMakeVisible(heading);
   heading.setText("EXPRESSIVE PHYSICAL | MIDI TO STRING DYNAMICS",juce::dontSendNotification);
-  heading.setColour(juce::Label::textColourId,juce::Colour(0xffc3eaff));
+  heading.setColour(juce::Label::textColourId,juce::Colour(0xffdffbf3));
   heading.setFont(juce::Font(juce::FontOptions(18.f,juce::Font::bold)));
   const char* names[]={"GLIDE (ms)","BEND SMOOTH (ms)","VELOCITY > PICK", "PRESSURE > DAMP", "RELEASE > DAMP", "VELOCITY FORCE", "BASE PICK POSITION", "BRIDGE MIX", "BODY MIX"};
   const double minima[]={0.,0.,0.,0.,0.,.2,.03,0.,0.};
@@ -20,7 +20,7 @@ public:
    auto&sl=sliders[size_t(i)];auto&lb=labels[size_t(i)];
    addAndMakeVisible(sl);addAndMakeVisible(lb);
    lb.setText(names[i],juce::dontSendNotification);
-   lb.setColour(juce::Label::textColourId,juce::Colour(0xff8db7cb));
+   lb.setColour(juce::Label::textColourId,juce::Colour(0xffabd5ca));
    sl.setRange(minima[i],maxima[i],.001);
    sl.setSliderStyle(juce::Slider::LinearHorizontal);
    sl.setTextBoxStyle(juce::Slider::TextBoxRight,false,73,22);
@@ -51,9 +51,9 @@ public:
   }
  }
  void paint(juce::Graphics&g)override{
-  g.fillAll(juce::Colour(0xff101e30));
-  g.setColour(juce::Colour(0xff294e65));g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(3.f),9.f,1.f);
-  g.setColour(juce::Colour(0xff88afc6));g.setFont(12.f);
+  g.fillAll(juce::Colour(0xff091f23));
+  g.setColour(juce::Colour(0xff2c6259));g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(3.f),9.f,1.f);
+  g.setColour(juce::Colour(0xffa4cbc2));g.setFont(12.f);
   g.drawText("Pressure adds contact damping; glide preserves modal phase. No full 3D string/contact simulation.",20,400,getWidth()-40,28,juce::Justification::left);
  }
 private:

@@ -26,8 +26,8 @@ public:
   damping_.setValue(m.decayBase,juce::dontSendNotification);
   harmonics_.setValue(m.harmonics,juce::dontSendNotification);
  }
- void paint(juce::Graphics&g)override{g.fillAll(juce::Colour(0xff0f1d2a));
-  g.setColour(juce::Colours::lightblue);g.setFont(14.f);
+ void paint(juce::Graphics&g)override{g.fillAll(juce::Colour(0xff091f24));
+  g.setColour(juce::Colour(0xff65e4cf));g.setFont(14.f);
   const char*names[]={"Fundamental Hz","Pluck Position","Pickup Position","Decay / second","Number of harmonics"};
   for(int i=0;i<5;i++)g.drawText(names[i],24,75+i*55,185,34,juce::Justification::centredLeft);
  }

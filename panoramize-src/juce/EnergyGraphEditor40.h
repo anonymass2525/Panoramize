@@ -28,7 +28,7 @@ public:
   drive_.setRange(0,500,0);area_.setRange(.0001,10.,0);output_.setRange(-1000.,1000.,0);
   mass_.setSkewFactorFromMidPoint(.2);nodeDamping_.setSkewFactorFromMidPoint(1.);linkDamping_.setSkewFactorFromMidPoint(.1);
   linkStiffness_.setRange(0,1e6,0);linkDamping_.setRange(0,1e5,0);
-  addAndMakeVisible(status_);status_.setColour(juce::Label::textColourId,juce::Colours::lightblue);
+  addAndMakeVisible(status_);status_.setColour(juce::Label::textColourId,juce::Colour(0xff65e4cf));
   domain_.addItem("MECHANICAL / force-velocity",1);domain_.addItem("ACOUSTIC / pressure-flow",2);
   linkKind_.addItem("SPRING / CONSERVATIVE",1);linkKind_.addItem("DAMPER / DISSIPATIVE",2);linkKind_.addItem("SPRING + DAMPER",3);
   addNode_.onClick=[this]{
@@ -76,28 +76,30 @@ public:
  }
  void setRecipe(const Recipe&r){recipe_=r;selectedNode_=recipe_.nodes.empty()?-1:0;selectedLink_=recipe_.links.empty()?-1:0;startLink_=-1;refreshControls();repaint();}
  void paint(juce::Graphics&g) override{
-  g.fillAll(juce::Colour(0xff0b1525));
+  g.fillAll(juce::Colour(0xff07191e));
   const auto canvas=canvasBounds();
-  g.setColour(juce::Colour(0xff13283b));g.fillRoundedRectangle(canvas.toFloat(),10.f);
-  g.setColour(juce::Colour(0xff54708d));g.drawRoundedRectangle(canvas.toFloat(),10.f,1.f);
+  g.setColour(juce::Colour(0xff102e32));g.fillRoundedRectangle(canvas.toFloat(),10.f);
+  g.setColour(juce::Colour(0xff387f73));g.drawRoundedRectangle(canvas.toFloat(),10.f,1.f);
+   g.setColour(juce::Colour(0xff35d7bd).withAlpha(.35f));
+   g.drawLine(float(canvas.getX()+9),float(canvas.getY()+2),float(canvas.getRight()-9),float(canvas.getY()+2),1.3f);
   for(size_t i=0;i<recipe_.links.size();i++){
    const auto&l=recipe_.links[i];if(l.from<0||l.to<0||l.from>=int(recipe_.nodes.size())||l.to>=int(recipe_.nodes.size()))continue;
    const auto a=location(l.from),b=location(l.to);
-   g.setColour(int(i)==selectedLink_?juce::Colours::orange:juce::Colour(0xff66a1d7));
+   g.setColour(int(i)==selectedLink_?juce::Colour(0xfff1c079):juce::Colour(0xff39cbb8));
    g.drawLine(a.x,a.y,b.x,b.y,int(i)==selectedLink_?4.f:2.f);
    auto mid=(a+b)*.5f;g.setFont(11.f);g.drawText(l.kind==panorama::energy40::LinkKind::Conservative?"K":l.kind==panorama::energy40::LinkKind::Dissipative?"D":"K+D",int(mid.x)-23,int(mid.y)-10,46,20,juce::Justification::centred);
   }
   for(size_t i=0;i<recipe_.nodes.size();i++){
    const auto c=location(int(i));
-   const auto col=recipe_.nodes[i].domain==Domain::Mechanical?juce::Colour(0xff285d8c):juce::Colour(0xff6c477d);
+   const auto col=recipe_.nodes[i].domain==Domain::Mechanical?juce::Colour(0xff18665d):juce::Colour(0xff645441);
    g.setColour(col);g.fillEllipse(c.x-28,c.y-28,56.f,56.f);
-   g.setColour(int(i)==selectedNode_?juce::Colours::orange:juce::Colours::lightblue);
+   g.setColour(int(i)==selectedNode_?juce::Colour(0xfff1c079):juce::Colour(0xff65e4cf));
    g.drawEllipse(c.x-28,c.y-28,56.f,56.f,selectedNode_==int(i)?3.f:1.f);
    g.setFont(12.f);g.drawFittedText(juce::String(int(i)+1),int(c.x)-17,int(c.y)-13,34,26,juce::Justification::centred,1);
-   if(int(i)==recipe_.exciteNode){g.setColour(juce::Colours::yellow);g.drawText("E",int(c.x)+17,int(c.y)-34,20,20,juce::Justification::centred);}
+   if(int(i)==recipe_.exciteNode){g.setColour(juce::Colour(0xffffdc94));g.drawText("E",int(c.x)+17,int(c.y)-34,20,20,juce::Justification::centred);}
    g.setFont(10.f);g.drawText(recipe_.nodes[i].domain==Domain::Mechanical?"N · m/s":"Pa · m3/s",int(c.x)-46,int(c.y)+32,92,16,juce::Justification::centred);
   }
-  g.setColour(juce::Colours::lightblue);g.setFont(12.f);
+  g.setColour(juce::Colour(0xff65e4cf));g.setFont(12.f);
   g.drawText("DRAG NODES / SELECT LINKS / CONNECT: TWO CLICKS / DOUBLE-CLICK: EXCITER",canvas.getX()+12,canvas.getY()+8,canvas.getWidth()-24,20,juce::Justification::centredLeft);
   g.drawText("NODE: frequency | mass/inertance | damping | active drive | area | pickup gain",14,getHeight()-300,getWidth()-18,22,juce::Justification::centredLeft);
   g.drawText("LINK: spring stiffness (N/m) | damper (N*s/m)",14,getHeight()-167,getWidth()-18,22,juce::Justification::centredLeft);

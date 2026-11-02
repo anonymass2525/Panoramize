@@ -2,10 +2,23 @@
 namespace {
 class PanoramaLook:public juce::LookAndFeel_V4 {
 public:
- PanoramaLook(){setColour(juce::Slider::thumbColourId,juce::Colour(0xff60c0eb));
-  setColour(juce::Slider::rotarySliderFillColourId,juce::Colour(0xff45b0db));
-  setColour(juce::ComboBox::backgroundColourId,juce::Colour(0xff19243c));
-  setColour(juce::ComboBox::textColourId,juce::Colours::white);
+ PanoramaLook(){setColour(juce::Slider::thumbColourId,juce::Colour(0xff5af0d8));
+  setColour(juce::Slider::rotarySliderFillColourId,juce::Colour(0xff35e4c9));
+  setColour(juce::Slider::trackColourId,juce::Colour(0xff279987));
+  setColour(juce::Slider::backgroundColourId,juce::Colour(0xff17383a));
+  setColour(juce::Slider::textBoxTextColourId,juce::Colour(0xffd6f8f1));
+  setColour(juce::Slider::textBoxBackgroundColourId,juce::Colour(0xff0a2126));
+  setColour(juce::Slider::textBoxOutlineColourId,juce::Colour(0xff28534e));
+  setColour(juce::ComboBox::backgroundColourId,juce::Colour(0xff102a2c));
+  setColour(juce::ComboBox::textColourId,juce::Colour(0xffd9f7ef));
+  setColour(juce::ComboBox::arrowColourId,juce::Colour(0xff52dcc3));
+  setColour(juce::TextButton::buttonColourId,juce::Colour(0xff143336));
+  setColour(juce::TextButton::buttonOnColourId,juce::Colour(0xff287c70));
+  setColour(juce::TextButton::textColourOnId,juce::Colour(0xfff5fffb));
+  setColour(juce::PopupMenu::highlightedBackgroundColourId,juce::Colour(0xff23776c));
+  setColour(juce::PopupMenu::highlightedTextColourId,juce::Colour(0xffeffff7));
+  setColour(juce::ScrollBar::thumbColourId,juce::Colour(0xff31766a));
+  setColour(juce::ToggleButton::textColourId,juce::Colour(0xffc4eee3));
   setColour(juce::PopupMenu::backgroundColourId,juce::Colour(0xff0b2228));
   setColour(juce::TextButton::textColourOffId,juce::Colour(0xffd3f9ef));
   setColour(juce::ComboBox::outlineColourId,juce::Colour(0xff32665f));
@@ -44,32 +57,41 @@ public:
 PanoramaLook gLook;
 }
 void PanoramaEditor::Content::paint(juce::Graphics&g){
- g.fillAll(juce::Colour(0xff0e1628));
- g.setColour(juce::Colour(0xff1b2c48));
- g.setColour(juce::Colour(0xffe3f5ff));
+ g.fillAll(juce::Colour(0xff061316));
+ g.setColour(juce::Colour(0xff102b30));
+ g.setColour(juce::Colour(0xffdffcf4));
  g.setFont(juce::Font(juce::FontOptions(17.f,juce::Font::bold)));
  g.drawText("MODULAR PATCHBAY  |  9 AUDIO NODES / 2 MOD LANES",20,5,getWidth()-40,25,juce::Justification::centredLeft);
- g.setFont(12.f);g.setColour(juce::Colour(0xff9eb5c9));
+ juce::ColourGradient headerLine(juce::Colour(0xff2ce6c9),18.f,49.f,
+                                 juce::Colour(0xfff3be79),float(getWidth()-20),49.f,false);
+ g.setGradientFill(headerLine);g.fillRoundedRectangle(18.f,48.f,float(getWidth()-36),1.5f,.75f);
+ g.setFont(12.f);g.setColour(juce::Colour(0xff9ccac2));
  g.drawText("Connect sources A/B; choose node DSP and change LEVEL / COLOR. No cycles allowed.",20,29,getWidth()-40,18,juce::Justification::centredLeft);
  for(int row=0;row<panorama::kGraphNodes;row++){
    auto bounds=juce::Rectangle<float>(12.f,55.f+row*65.f,(float)getWidth()-24.f,61.f);
-   g.setColour(juce::Colour(row==panorama::kGraphNodes-1?0xff274155:0xff1b2c48));
+   g.setColour(juce::Colour(row==panorama::kGraphNodes-1?0xff25443d:0xff102b30));
    g.fillRoundedRectangle(bounds,8.f);
-   g.setColour(juce::Colour(0xff365171));g.drawRoundedRectangle(bounds,8.f,1.f);
+   g.setColour(juce::Colour(0xff2f655e));g.drawRoundedRectangle(bounds,8.f,1.f);
+   g.setColour(juce::Colour(row==panorama::kGraphNodes-1?0xffe7bc78:0xff27cbb6));
+   g.fillRoundedRectangle(bounds.getX()+2.f,bounds.getY()+8.f,3.f,bounds.getHeight()-16.f,1.5f);
  }
- g.setColour(juce::Colour(0xffe3f5ff));g.setFont(juce::Font(juce::FontOptions(17.f,juce::Font::bold)));
+ g.setColour(juce::Colour(0xffdffcf4));g.setFont(juce::Font(juce::FontOptions(17.f,juce::Font::bold)));
  g.drawText("MODULATION MATRIX  |  Source > Target > Property",20,640,getWidth()-40,26,juce::Justification::centredLeft);
- g.setColour(juce::Colour(0xff1b2c48));
+ g.setColour(juce::Colour(0xff102b30));
  g.fillRoundedRectangle(juce::Rectangle<float>(12.f,672.f,(float)getWidth()-24.f,120.f),9.f);
+  g.setColour(juce::Colour(0xff2b6259));
+  g.drawRoundedRectangle(juce::Rectangle<float>(12.f,672.f,(float)getWidth()-24.f,120.f),9.f,1.f);
  const int knobTop=860;
- g.setColour(juce::Colour(0xffe3f5ff));g.setFont(juce::Font(juce::FontOptions(17.f,juce::Font::bold)));
+ g.setColour(juce::Colour(0xffdffcf4));g.setFont(juce::Font(juce::FontOptions(17.f,juce::Font::bold)));
  g.drawText("GLOBAL SOUND CONTROLS",20,820,getWidth()-40,30,juce::Justification::centredLeft);
- g.setColour(juce::Colour(0xff1b2c48));
+ g.setColour(juce::Colour(0xff102b30));
  for(int row=0;row<5;row++){
   auto bounds=juce::Rectangle<float>(12.f,(float)knobTop+row*180.f,(float)getWidth()-24.f,172.f);
   g.fillRoundedRectangle(bounds,12.f);
-  g.setColour(juce::Colour(0xff365171));g.drawRoundedRectangle(bounds,12.f,1.f);
-  g.setColour(juce::Colour(0xff1b2c48));
+  g.setColour(juce::Colour(0xff2f655e));g.drawRoundedRectangle(bounds,12.f,1.f);
+   g.setColour(juce::Colour(row==0?0xffe7bd79:0xff2bc3b1).withAlpha(.65f));
+   g.fillRoundedRectangle(bounds.getX()+3.f,bounds.getY()+8.f,3.f,bounds.getHeight()-16.f,1.5f);
+  g.setColour(juce::Colour(0xff102b30));
  }
 }
 PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),processor(p),unifiedPanel(p),dashboard(p){
@@ -93,7 +115,7 @@ PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),proc
  graphToggle.setButtonText(processor.isUniversalEnabled()?"ENGINE: UNIFIED  /  USE FACTORY":"ENGINE: FACTORY  /  USE UNIFIED");
  subtitle.setText("VA / DIGITAL / MODAL / COUPLED MODES / MODULAR PATCHBAY",juce::dontSendNotification);
  subtitle.setJustificationType(juce::Justification::centredLeft);
- subtitle.setColour(juce::Label::textColourId,juce::Colour(0xff91a7c4));addAndMakeVisible(subtitle);
+ subtitle.setColour(juce::Label::textColourId,juce::Colour(0xff9ec4bc));addAndMakeVisible(subtitle);
  for(int i=0;i<panorama::kPresetCount;i++)preset.addItem(panorama::factoryPresets()[(size_t)i].name,i+1);
  preset.setSelectedId(processor.getCurrentProgram()+1,juce::dontSendNotification);
  preset.onChange=[this](){processor.loadPreset(preset.getSelectedId()-1);};addAndMakeVisible(preset);
@@ -132,7 +154,7 @@ PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),proc
 }
 void PanoramaEditor::addKnob(const char*id,const char*name){
  Knob k;k.label=std::make_unique<juce::Label>();k.label->setText(name,juce::dontSendNotification);
- k.label->setJustificationType(juce::Justification::centred);k.label->setColour(juce::Label::textColourId,juce::Colour(0xffb8cadf));
+ k.label->setJustificationType(juce::Justification::centred);k.label->setColour(juce::Label::textColourId,juce::Colour(0xffb9e1d7));
  k.slider=std::make_unique<juce::Slider>();k.slider->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
  k.slider->setTextBoxStyle(juce::Slider::TextBoxBelow,false,84,20);
  k.slider->setColour(juce::Slider::textBoxTextColourId,juce::Colours::white);
@@ -223,7 +245,7 @@ void PanoramaEditor::initGraph(){
   auto& r=graphRows[i];const auto sid=juce::String(i);
   r.label=std::make_unique<juce::Label>();
   r.label->setText(i==panorama::kGraphNodes-1?"OUT":"N"+juce::String(i+1),juce::dontSendNotification);
-  r.label->setColour(juce::Label::textColourId,juce::Colour(0xffe1f1fe));
+  r.label->setColour(juce::Label::textColourId,juce::Colour(0xffd6f8ec));
   content.addAndMakeVisible(*r.label);
   if(i<panorama::kGraphNodes-1){
     r.type=std::make_unique<juce::ComboBox>();
@@ -252,7 +274,7 @@ void PanoramaEditor::initGraph(){
   mkSlider(r.level,"gLevel"+sid,r.levelAttach);
   mkSlider(r.color,"gColor"+sid,r.colorAttach);
  }
- graphStatus.setColour(juce::Label::textColourId,juce::Colour(0xff91cadd));
+ graphStatus.setColour(juce::Label::textColourId,juce::Colour(0xff92d9cb));
  graphStatus.setJustificationType(juce::Justification::centredRight);
  addAndMakeVisible(graphStatus);
 }
