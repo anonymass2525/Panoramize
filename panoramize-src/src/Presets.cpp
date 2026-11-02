@@ -16,11 +16,6 @@ const std::array<Patch,kPresetCount>& factoryPresets(){
  {"10 / Astral Chimes",Engine::Hybrid,.95f,.17f,.003f,.90f,.26f,1.50f,.17f,.46f,.44f,.24f,.86f,.23f,.67f,.86f,.86f,.45f},
  {"11 / Living Supersaw",Engine::Hybrid,.84f,.29f,.08f,.43f,.73f,.70f,.33f,.90f,.16f,.14f,.72f,.45f,.55f,.42f,.80f,.48f},
  {"12 / Fractal Tide",Engine::Hybrid,.70f,.30f,.24f,.79f,.61f,1.70f,.21f,.55f,.62f,.66f,.78f,.52f,.89f,.73f,.65f,.46f},
- // v5.5: deliberately evolve the fifth factory bell: Fractal Digital exciter
- // plus a parallel inharmonic, energy-decaying modal body (editable from UI).
- // metalMix=0 on earlier sessions restores the original sample path.
- v[4].metalMix=.57f;v[4].metalColor=.66f;v[4].metalDecay=.75f;
- v[4].stereoResonance=.24f;
  // v0.2: four original routing-specific sound-design studies
  {"13 / Solar Harp",Engine::Hybrid,.86f,.20f,.010f,.60f,.37f,1.10f,.26f,.80f,.09f,.18f,.85f,.25f,.26f,.88f,.84f,.48f,1,.83f,.86f},
  {"14 / Mercury Veil",Engine::Hybrid,.91f,.14f,.27f,.84f,.64f,1.75f,.18f,.28f,.73f,.65f,.87f,.37f,.80f,.87f,.77f,.46f,2,.88f,.82f},
@@ -36,6 +31,11 @@ const std::array<Patch,kPresetCount>& factoryPresets(){
  {"23 / Static Cathedral",Engine::Modular,.91f,.14f,.72f,1.12f,.79f,2.12f,.08f,.21f,.88f,.46f,.86f,.35f,.92f,.62f,.82f,.45f},
  {"24 / Prismatic Organism",Engine::Modular,.95f,.12f,.02f,1.21f,.61f,1.49f,.28f,.68f,.73f,.74f,.96f,.14f,.71f,.84f,.97f,.50f},
  }};
+ // v5.5: deliberately evolve the fifth factory bell: Fractal Digital exciter
+ // plus a parallel inharmonic, energy-decaying modal body (editable from UI).
+ // metalMix=0 on earlier sessions restores the original sample path.
+ v[4].metalMix=.57f;v[4].metalColor=.66f;v[4].metalDecay=.75f;
+ v[4].stereoResonance=.24f;
  // v0.4: reimagined additive and phase-warp sound design; these are deliberately
  // not required to resemble the v0.1 VA/legacy factory sounds.
  v[24]={"25 / Midnight Geometry Reforged",Engine::Modular,.88f,.15f,.045f,.65f,.69f,1.1f,.23f,.55f,.59f,.52f,.83f,.26f,.52f,.53f,.84f,.48f};
