@@ -1,0 +1,14 @@
+# PANORAMA 2.1: small-deformation 3D solid made from two tetrahedra
+# body,name,rest_x,rest_y,rest_z,mass_kg,anchor_N_per_m,damper_Ns_per_m
+body,a,0,0,0,0.04,30,0.5
+body,b,0.1,0,0,0.04,30,0.5
+body,c,0,0.1,0,0.04,30,0.5
+body,d,0,0,0.1,0.04,30,0.5
+body,e,0.1,0.1,0.1,0.04,30,0.5
+# tetra,vertex0,vertex1,vertex2,vertex3,Young_Pa,Poisson,density_kgm3,loss_seconds
+tetra,0,1,2,3,160000,0.25,1000,0.0002
+tetra,1,2,3,4,350000,0.32,1200,0.0002
+excite,0,0,0,0.13
+excite,1,0.06,0,0.05
+pickup,1,0.3,0,0.7
+pickup,4,0,0.35,0.65

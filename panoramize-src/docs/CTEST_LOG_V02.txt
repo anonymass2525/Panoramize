@@ -1,0 +1,8 @@
+Internal ctest changing into directory: /mnt/data/PANORAMA_typeGPT_v0.2/build
+Test project /mnt/data/PANORAMA_typeGPT_v0.2/build
+    Start 1: PANORAMA_DSP
+1/1 Test #1: PANORAMA_DSP .....................   Passed    1.27 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.28 sec

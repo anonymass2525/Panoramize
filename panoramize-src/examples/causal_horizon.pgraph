@@ -1,0 +1,6 @@
+PANORAMA-GRAPH-23|1
+NAME|Causal Horizon
+NODE|0|-1|-1|0|0.5
+NODE|2|0|2|0|0.16
+NODE|5|1|-1|0|1
+NODE|6|1|-1|0|0.8

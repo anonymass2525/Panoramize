@@ -1,0 +1,30 @@
+# PANORAMA 2.2 normalized acoustic state graph, no commas in names.
+# mode,name,domain,freqHz,dampingPerSecond,quarticJ,readout_calibration
+mode,body,physical,112,1.5,0,0.000001
+mode,harmonics,spectral,224.5,1.1,0,1.0
+mode,phase,phase,337.2,1.6,0,1.0
+mode,modal,resonance,440,2.0,0,0
+mode,fold,nonlinear,280,1.0,900000000000,0
+mode,vowelF1,vocal,730,2.5,0,1.5
+mode,vowelF2,vocal,1320,3.4,0,1.5
+# link,modeA,modeB,conservative|dissipative,strength,ratio
+link,body,harmonics,conservative,180000,0.8
+link,harmonics,phase,conservative,140000,0.8
+link,phase,modal,conservative,120000,0.6
+link,modal,fold,conservative,170000,0.9
+link,fold,vowelF1,conservative,220000,0.7
+link,vowelF1,vowelF2,conservative,160000,0.65
+link,vowelF2,body,conservative,100000,0.3
+link,harmonics,vowelF1,dissipative,0.7,0.8
+# kick,mode,normalizedInitialVelocity
+kick,body,0.4
+kick,harmonics,0.18
+kick,phase,0.11
+# drive,mode,normalizedForce,repeatEveryNSamples
+drive,body,35,1600
+# pickup,mode,leftGain,rightGain
+pickup,body,0.4,0.3
+pickup,harmonics,0.1,0.25
+pickup,vowelF1,0.7,0.5
+pickup,vowelF2,0.35,0.5
+seconds,1.4

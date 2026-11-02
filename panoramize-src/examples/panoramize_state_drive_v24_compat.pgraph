@@ -1,0 +1,6 @@
+PANORAMAIZE-GRAPH-24|1
+NAME|Phase State Excitation
+NODE|0|-1|-1|0|0
+NODE|7|0|2|0|0.65
+NODE|1|-1|-1|0|1
+NODE|6|2|-1|0|0.95

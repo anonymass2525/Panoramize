@@ -1,0 +1,66 @@
+name: Panoramize 5.4.0 Windows VST3 and JUCE Validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  windows-vst3:
+    runs-on: windows-2022
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pinned JUCE 8 security release
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: 8.0.16-security
+          path: external/JUCE
+          persist-credentials: false
+      - name: Configure Windows x64
+        shell: pwsh
+        run: >-
+          cmake -S . -B build-win -G "Visual Studio 17 2022" -A x64
+          -DPANORAMA_BUILD_VST3=ON
+          -DPANORAMA_BUILD_JUCE_SMOKE=ON
+          -DPANORAMA_JUCE_PATH="$env:GITHUB_WORKSPACE/external/JUCE"
+      - name: Compile DSP, JUCE smoke and VST3 (Release)
+        shell: pwsh
+        run: cmake --build build-win --config Release --parallel 4
+      - name: DSP + JUCE processor/editor integration tests
+        shell: pwsh
+        run: ctest --test-dir build-win -C Release --output-on-failure --timeout 180 -E "^PANORAMA_DSP$|^Panoramize_DeepInverse46$"
+      - name: Validate VST3 structure
+        shell: pwsh
+        run: ./ci/Validate-WindowsVST3.ps1 -BuildRoot "build-win"
+      - name: Obtain pluginval for GUI-inclusive validation
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "tools/pluginval" | Out-Null
+          Invoke-WebRequest "https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_Windows.zip" -OutFile "tools/pluginval.zip"
+          Expand-Archive -Path "tools/pluginval.zip" -DestinationPath "tools/pluginval" -Force
+      - name: pluginval strictness 5 with GUI tests and machine-readable result
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path "tools/pluginval" -Filter "pluginval.exe" -File -Recurse | Select-Object -First 1
+          if (-not $exe) { throw "No pluginval.exe inside downloaded archive" }
+          ./ci/Validate-WindowsVST3-53.ps1 -BuildRoot "build-win" -PluginvalExe $exe.FullName
+      - name: Upload VST3 and validation logs (only after passing)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Panoramize-v5.4.0-Windows-x64-VST3-validated
+          path: |
+            build-win/Panoramize_Plugin_artefacts/Release/VST3/
+            build-win/validation-logs/
+            docs/BUILD_WINDOWS_JA.md
+          if-no-files-found: error
+      - name: Preserve logs if the validation fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Panoramize-v5.4.0-Windows-validation-failed
+          path: |
+            build-win/Testing/
+            build-win/validation-logs/
+          if-no-files-found: ignore

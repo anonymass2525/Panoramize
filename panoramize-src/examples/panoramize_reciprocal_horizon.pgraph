@@ -1,0 +1,8 @@
+PANORAMIZE-GRAPH-25|1
+NAME|Reciprocal Horizon
+NODE|0|-1|-1|0|1
+NODE|7|0|2|0|0.8
+NODE|1|-1|-1|0|0.8
+NODE|8|2|0|0|0.8
+NODE|2|0|2|0|0.5
+NODE|6|4|-1|0|0.85

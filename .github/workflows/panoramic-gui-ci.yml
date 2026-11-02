@@ -1,0 +1,61 @@
+name: Panoramize Panoramic GUI - Windows VST3 verification
+on:
+  push:
+    branches: [feature/panoramic-gui]
+    paths:
+      - "panoramize-src/**"
+      - ".github/workflows/panoramic-gui-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-vst3:
+    runs-on: windows-2022
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preserve assertions and stack size in Release test executables
+        shell: pwsh
+        run: |
+          $cmake = 'panoramize-src/CMakeLists.txt'
+          $testFix = @'
+          if(MSVC)
+            get_property(_ci_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+            foreach(_t IN LISTS _ci_targets)
+              if(_t MATCHES "(_test|_smoke)$")
+                get_target_property(_kind "${_t}" TYPE)
+                if(_kind STREQUAL "EXECUTABLE")
+                  target_compile_options("${_t}" PRIVATE "$<$<CONFIG:Release>:/UNDEBUG>")
+                  target_link_options("${_t}" PRIVATE "/STACK:67108864")
+                endif()
+              endif()
+            endforeach()
+          endif()
+          '@
+          Add-Content -Path $cmake -Value $testFix -Encoding utf8
+      - name: Build and test versioned GUI source
+        shell: pwsh
+        run: |
+          & '.\panoramize-src\ci\Build-Test-Windows54.ps1' -InstallScope None
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve VST3 and verification logs
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifact -Force | Out-Null
+          $root = 'panoramize-src'
+          $vst3 = Join-Path $root 'build-win/Panoramize_Plugin_artefacts/Release/VST3'
+          if (Test-Path $vst3) { Copy-Item -Path $vst3 -Destination 'artifact/VST3' -Recurse -Force }
+          $logs = Join-Path $root 'windows-validation54'
+          if (Test-Path $logs) { Copy-Item -Path $logs -Destination 'artifact/validation' -Recurse -Force }
+          $testing = Join-Path $root 'build-win/Testing'
+          if (Test-Path $testing) { Copy-Item -Path $testing -Destination 'artifact/Testing' -Recurse -Force }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Panoramize-Panoramic-GUI-Windows-VST3
+          path: artifact/
+          retention-days: 90
+          if-no-files-found: warn

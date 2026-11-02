@@ -1,0 +1,24 @@
+Internal ctest changing into directory: /mnt/data/PANORAMA_21_work/build
+Test project /mnt/data/PANORAMA_21_work/build
+    Start 1: PANORAMA_DSP
+    Start 6: PANORAMA_GraphInverse
+    Start 7: PANORAMA_PlayableInstrument
+    Start 3: PANORAMA_UnifiedState
+    Start 4: PANORAMA_AdvancedState
+    Start 5: PANORAMA_PassiveCoupling
+    Start 2: PANORAMA_FastMath
+    Start 8: PANORAMA_Acoustic21
+    Start 9: PANORAMA_StateGraphCSV
+1/9 Test #2: PANORAMA_FastMath ................   Passed    0.05 sec
+2/9 Test #9: PANORAMA_StateGraphCSV ...........   Passed    0.04 sec
+3/9 Test #5: PANORAMA_PassiveCoupling .........   Passed    0.15 sec
+4/9 Test #8: PANORAMA_Acoustic21 ..............   Passed    0.51 sec
+5/9 Test #3: PANORAMA_UnifiedState ............   Passed    0.98 sec
+6/9 Test #4: PANORAMA_AdvancedState ...........   Passed    0.99 sec
+7/9 Test #7: PANORAMA_PlayableInstrument ......   Passed    2.32 sec
+8/9 Test #6: PANORAMA_GraphInverse ............   Passed    4.86 sec
+9/9 Test #1: PANORAMA_DSP .....................   Passed   28.97 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =  28.97 sec
