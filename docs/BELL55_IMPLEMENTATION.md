@@ -16,6 +16,17 @@ The eight modal frequencies are *artistic* inharmonic ratios, not empirically me
 - No new sample libraries. This is algorithmic synthesis.
 - Other factory sounds retain `metalMix=0` by default. Non-Fractal engines ignore the new controls.
 
+## Verified results — 2026-11-02
+
+- **Windows x64 MSVC Release**: PASS.
+- **CTest**: **47/47 passed**, including new `PANORAMA_Bell55` test.
+- **pluginval strictness 5**: PASS, including editor/automation checks.
+- **Three 48kHz dry preview WAVs**: successfully rendered on Windows and Linux.
+- **Studio One actual playback / preset restoration**: **not yet manually verified** for this build.
+- Windows CI artifact: https://github.com/anonymass2525/Panoramize/actions/runs/41387560668
+- DSP-only Linux run and dry previews: https://github.com/anonymass2525/Panoramize/actions/runs/41387963679
+- Product bundle retains legacy name `Panoramize v5.4.0.vst3` from JUCE `PRODUCT_NAME`; the project now compiles version 5.5.0 and includes enhanced sound. Keep only one installed VST3 with the original identifier.
+
 ## Workflow and comparison materials
 - `tools/render_bell55.cpp`: offline deterministic dry stereo WAV renders at 48 kHz (C5, velocity .82, 1 s note-on, 2.5 s tail).
 - `bell05_original_dry.wav` vs `bell05_evolved55_dry.wav` vs `bell05_shimmer55_dry.wav` are produced by the Windows GitHub Actions workflow and bundled with the VST3.
