@@ -57,5 +57,5 @@ jobs:
         with:
           name: Panoramize-Panoramic-GUI-Windows-VST3
           path: artifact/
-          retention-days: 14
+          retention-days: 90
           if-no-files-found: warn
