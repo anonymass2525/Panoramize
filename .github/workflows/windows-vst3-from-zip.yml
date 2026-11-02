@@ -90,4 +90,4 @@ jobs:
           name: Panoramize-v5.4-Windows-x64-build-results
           path: artifact/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 90
