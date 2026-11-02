@@ -1,0 +1,33 @@
+name: Panoramize Bell55 - DSP-only Linux audio validation
+on:
+  push:
+    branches: [feature/bell-55]
+    paths:
+      - 'panoramize-src/**'
+      - '.github/workflows/bell55-linux.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bell55-dsp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure standalone DSP
+        run: cmake -S panoramize-src -B build-bell55 -DCMAKE_BUILD_TYPE=Release -DPANORAMA_BUILD_VST3=OFF
+      - name: Build only Bell55 test and renderer
+        run: cmake --build build-bell55 --target panorama_bell55_test panorama_bell55_preview --parallel 4
+      - name: Bell55 regression check
+        run: ctest --test-dir build-bell55 -R '^PANORAMA_Bell55$' --output-on-failure
+      - name: Render original / evolved / shimmer comparison WAV
+        run: ./build-bell55/panorama_bell55_preview bell55-previews
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Panoramize-Bell55-Dry-Audio-Previews-Linux
+          path: bell55-previews/
+          if-no-files-found: warn
+          retention-days: 14
