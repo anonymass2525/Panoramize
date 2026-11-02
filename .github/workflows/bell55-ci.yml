@@ -64,5 +64,5 @@ jobs:
         with:
           name: Panoramize-Bell55-Windows-VST3-Audio-Demos
           path: artifact/
-          retention-days: 14
+          retention-days: 90
           if-no-files-found: warn
