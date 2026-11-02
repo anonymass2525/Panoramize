@@ -101,6 +101,7 @@ UniversalGraphPanel23::UniversalGraphPanel23(PanoramaProcessor& p):processor(p){
   energyButton.setButtonText(show?"BACK TO PATCHBAY":"EDIT ENERGY GRAPH");resized();
  };
  expressiveButton.onClick=[this](){
+  if(parameterEditor)parameterEditor->setVisible(false);
   if(energyEditor)energyEditor->setVisible(false);
   if(genuineEditor)genuineEditor->setVisible(false);
   if(stringEditor)stringEditor->setVisible(false);
@@ -120,9 +121,7 @@ UniversalGraphPanel23::UniversalGraphPanel23(PanoramaProcessor& p):processor(p){
    coupledEditor->setVisible(show);
    if(contactEditor)contactEditor->setVisible(false);
    if(articulationEditor)articulationEditor->setVisible(false);
-   if(coupledEditor)coupledEditor->setVisible(false);
    if(expressiveEditor)expressiveEditor->setVisible(false);
-   if(coupledEditor)coupledEditor->setVisible(false);
    if(stateEditor)stateEditor->setVisible(false);
    viewport.setVisible(!show);stateButton.setButtonText("EDIT ACOUSTIC STATE");
    expressiveButton.setButtonText(show?"BACK TO PATCHBAY":"EDIT SIX-STRING FEM");
@@ -152,6 +151,7 @@ UniversalGraphPanel23::UniversalGraphPanel23(PanoramaProcessor& p):processor(p){
    if(show)articulationEditor->setModel(editing.articulated33);
    articulationEditor->setVisible(show);
    if(expressiveEditor)expressiveEditor->setVisible(false);
+   if(contactEditor)contactEditor->setVisible(false);
    if(coupledEditor)coupledEditor->setVisible(false);
    if(stateEditor)stateEditor->setVisible(false);
    viewport.setVisible(!show);stateButton.setButtonText("EDIT ACOUSTIC STATE");
@@ -166,6 +166,8 @@ UniversalGraphPanel23::UniversalGraphPanel23(PanoramaProcessor& p):processor(p){
    if(show)expressiveEditor->setModel(editing.expressive32);
    expressiveEditor->setVisible(show);
    if(articulationEditor)articulationEditor->setVisible(false);
+   if(contactEditor)contactEditor->setVisible(false);
+   if(coupledEditor)coupledEditor->setVisible(false);
    if(stateEditor)stateEditor->setVisible(false);
    viewport.setVisible(!show);stateButton.setButtonText("EDIT ACOUSTIC STATE");
    expressiveButton.setButtonText(show?"BACK TO PATCHBAY":"EDIT EXPRESSION");
