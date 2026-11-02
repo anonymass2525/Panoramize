@@ -15,21 +15,21 @@ public:
   using A = juce::AudioProcessorValueTreeState;
   const char* ids[] = {"cutoff","resonance","fm","blend","detune","motion","brightness","gain",
                        "cutoff","resonance","attack","decay","sustain","release","body","damping",
-                       "crossDepth","stereoResonance"};
+                       "crossDepth","stereoResonance","metalMix","metalColor","metalDecay"};
   const char* captions[] = {"TONE","RESONANCE","FM INDEX","HYBRID MIX","DETUNE","MOTION","EXCITER","OUTPUT",
                             "CUTOFF","RESONANCE","ATTACK","DECAY","SUSTAIN","RELEASE","BODY","DAMPING",
-                            "CROSS DEPTH","STEREO WIDTH"};
+                            "CROSS DEPTH","STEREO WIDTH","BELL BODY","METAL COLOR","BELL TAIL"};
   // Coordinates are expressed in a 1500 x 795 logical surface.
-  const int x[] = { 196,358,520,682,844,1006,1168,1330, 393,490,608,682,756,830,965,1044,1218,1371 };
-  const int y[] = { 18,18,18,18,18,18,18,18, 478,478,478,478,478,478,478,478,487,487 };
-  const int w[] = { 92,92,92,92,92,92,92,92, 84,84,72,72,72,72,72,72,106,106 };
-  for (int i=0;i<18;++i) {
+  const int x[] = { 196,358,520,682,844,1006,1168,1330, 393,490,608,682,756,830,965,1044,1218,1371, 30,136,242 };
+  const int y[] = { 18,18,18,18,18,18,18,18, 478,478,478,478,478,478,478,478,487,487, 326,326,326 };
+  const int w[] = { 92,92,92,92,92,92,92,92, 84,84,72,72,72,72,72,72,106,106, 90,90,90 };
+  for (int i=0;i<21;++i) {
    auto c=std::make_unique<Control>();
-   c->id=ids[i];c->caption=captions[i];c->rect={x[i],y[i],w[i],100};
+   c->id=ids[i];c->caption=captions[i];c->rect={x[i],y[i],w[i],i>=18?82:100};
    c->slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
    c->slider.setTextBoxStyle(juce::Slider::TextBoxBelow,false,72,18);
    c->slider.setColour(juce::Slider::textBoxTextColourId,juce::Colour(0xffb9e8e2));
-   c->slider.setColour(juce::Slider::rotarySliderFillColourId,juce::Colour(i==1||i==9?0xfff8bf74:0xff34edcf));
+   c->slider.setColour(juce::Slider::rotarySliderFillColourId,juce::Colour(i==1||i==9||i>=18?0xfff8bf74:0xff34edcf));
    c->slider.setColour(juce::Slider::rotarySliderOutlineColourId,juce::Colour(0xff25434b));
    c->slider.setColour(juce::Slider::thumbColourId,juce::Colour(0xffe9fdf8));
    c->attachment=std::make_unique<A::SliderAttachment>(processor.params,ids[i],c->slider);
@@ -90,9 +90,9 @@ public:
   txt(g,"SOUND SOURCES",29,123,290,21,16,juce::Colour(0xffe2fcf5),true);
   txt(g,"FACTORY DSP ENGINE",30,199,270,20,11,juce::Colour(0xffa4cfc8));
   drawWave(g,39,226,276,67,0,juce::Colour(0xff18dcc8));
-  labelChip(g,32,306,90,"VA / DIGITAL");labelChip(g,129,306,84,"MODAL");labelChip(g,220,306,92,"HYBRID");
-  txt(g,"One selected engine drives this layer.",31,354,303,20,11,juce::Colour(0xff99b9b5));
-  txt(g,"Advanced and Graph reveal deeper routing.",31,377,303,20,11,juce::Colour(0xff99b9b5));
+  txt(g,"BELL BODY",32,303,98,18,11,juce::Colour(0xffefc683),true);
+  txt(g,"METAL COLOR",135,303,101,18,11,juce::Colour(0xffefc683),true);
+  txt(g,"BELL TAIL",244,303,90,18,11,juce::Colour(0xffefc683),true);
   panel(g,12,426,336,252);
   txt(g,"PERFORMANCE / STATUS",30,442,288,22,14,juce::Colour(0xffdef8ef),true);
   txt(g,lastFactory?"FACTORY SOUND  •  EDITABLE":"UNIFIED SOUND  •  GRAPH MODE",30,480,284,28,14,

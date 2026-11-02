@@ -41,6 +41,9 @@ struct Patch {
     float stereoResonance=0.0f;
     GraphPatch graph{}; // v0.3: user-editable modular graph; ignored by all legacy engines
     std::array<ModRoute,2> modRoutes{}; // v0.4: modular-source and audio-rate modulation
+    // v5.5: opt-in inharmonic bell resonator in the Fractal Digital engine.
+    // Defaults keep all existing hand-authored and legacy patches bit-identical.
+    float metalMix=0.f, metalColor=0.5f, metalDecay=0.5f;
 };
 const std::array<Patch,kPresetCount>& factoryPresets();
 // Exact comparison of all DSP-relevant patch settings; allocation-free.

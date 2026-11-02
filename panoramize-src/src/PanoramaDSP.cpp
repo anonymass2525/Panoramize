@@ -131,10 +131,12 @@ bool validateModRoutes(const GraphPatch& graph,const std::array<ModRoute,2>& rou
 bool samePatchConfiguration(const Patch& a,const Patch& b) noexcept {
  if(std::tie(a.name,a.engine,a.cutoff,a.resonance,a.attack,a.decay,a.sustain,a.release,
              a.detune,a.unison,a.fm,a.fold,a.resonanceBody,a.damping,a.motion,
-             a.blend,a.brightness,a.gain,a.routing,a.crossDepth,a.stereoResonance)
+             a.blend,a.brightness,a.gain,a.routing,a.crossDepth,a.stereoResonance,
+             a.metalMix,a.metalColor,a.metalDecay)
    !=std::tie(b.name,b.engine,b.cutoff,b.resonance,b.attack,b.decay,b.sustain,b.release,
              b.detune,b.unison,b.fm,b.fold,b.resonanceBody,b.damping,b.motion,
-             b.blend,b.brightness,b.gain,b.routing,b.crossDepth,b.stereoResonance))return false;
+             b.blend,b.brightness,b.gain,b.routing,b.crossDepth,b.stereoResonance,
+             b.metalMix,b.metalColor,b.metalDecay))return false;
  for(int i=0;i<kGraphNodes;i++){
   const auto& x=a.graph.nodes[(size_t)i];const auto& y=b.graph.nodes[(size_t)i];
   if(std::tie(x.type,x.a,x.b,x.level,x.color)!=std::tie(y.type,y.a,y.b,y.level,y.color))return false;
@@ -214,12 +216,27 @@ void Synth::Voice::start(int midi,float velocity,int ch,uint64_t count,double sr
  }
  noiseDecay=std::exp(-1.0/(sr*(.014+.060*(1-p.damping))));
  // Inharmonic partial ratios deliberately tuned away from strict harmonic series.
+ // The original eight-mode initialization remains exactly intact unless an
+ // enhanced bell is expressly enabled for Fractal Digital.
  constexpr double ratios[]={1.,1.499,2.14,2.997,4.01,5.53,7.21,10.9};
+ const bool enhancedBell=(p.engine==Engine::FractalDigital && p.metalMix>0.f);
  for(int i=0;i<8;i++){
    auto &m=modes[i];m.y1=m.y2=0;
    double shift=1.+.13*double(p.motion)*std::sin(i*2.5+midi*.21);
+   if(enhancedBell){
+     // Realistic-sounding plate partials are not constrained to harmonics.
+     // This is an intentionally *stylized modal model*, not calibrated FEM.
+     const double stretched=(ratios[i]-1.)*.015*(double(p.metalColor)-.5);
+     shift*=1.+stretched;
+   }
    const double hz=clamp(baseHz*ratios[i]*shift,40.,sr*.43);
    double q=clamp(.997-((.00008+i*.00018)+p.damping*(.00025+i*.0007))*48000./sr,.90,.99993);
+   if(enhancedBell){
+     // Per-partial T60: high metal partials fade faster than body modes.
+     // A stable pole radius < 1 guarantees exponential decay without drive.
+     const double t60=(.30+3.0*clamp(p.metalDecay,0.,1.))*std::exp(-.13*i);
+     q=clamp(std::exp(-6.907755278982137/(sr*t60)),.90,.99998);
+   }
    m.r=q; m.cosw=2.*std::cos(twoPi*hz/sr);
    m.energy=(1./(1.+i*.8))*((i%3==0)?1.:-.74);
  }
@@ -292,7 +309,13 @@ double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,doub
   auto &m=modes[i];
   double y=m.r*m.cosw*m.y1-m.r*m.r*m.y2+excitation*m.energy*.09;
   m.y2=m.y1;m.y1=y;
-  const double contribution=y/(1.+i*.23);
+  double contribution=y/(1.+i*.23);
+  if(p.engine==Engine::FractalDigital && p.metalMix>0.f){
+    // Live tone color: tilt the inharmonic partials, without retuning
+    // resonators already struck during the current note.
+    const double tilt=1.+.55*(double(p.metalColor)-.5)*(double(i)-3.5)/3.5;
+    contribution*=tilt;
+  }
   modal+=contribution;
   // Alternate modal partials spatially; zero width retains the original mono sound.
   const double width=clamp(p.stereoResonance,0.,1.);
@@ -308,7 +331,20 @@ double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,doub
  double outL=0,outR=0;
  switch(p.engine){
  case Engine::CrystalVA:outL=vaL;outR=vaR;break;
- case Engine::FractalDigital:outL=outR=fmOut;break;
+ case Engine::FractalDigital:{
+  if(p.metalMix<=0.f){
+    // Exact original Factory Bell / Fractal Digital output when disabled.
+    outL=outR=fmOut;
+  }else{
+    // New metallic body runs in parallel with the distinctive original
+    // PM/fold carrier; conservative direct gain preserves attack clarity.
+    const double wet=clamp(p.metalMix,0.,1.);
+    const double bodyGain=.68+.26*clamp(p.resonanceBody,0.,1.);
+    outL=(1.-.30*wet)*fmOut+wet*bodyGain*physicalL;
+    outR=(1.-.30*wet)*fmOut+wet*bodyGain*physicalR;
+  }
+  break;
+ }
  case Engine::PhysicalResonance:outL=outR=physical;break;
  case Engine::Modular: break; // Handled by processGraph() before the legacy switch.
  case Engine::Hybrid:{
@@ -1064,6 +1100,9 @@ void Synth::setPatch(const Patch& p){
  patch_.routing=std::clamp(p.routing,0,4);
  patch_.crossDepth=clamp(p.crossDepth,0,1);
  patch_.stereoResonance=clamp(p.stereoResonance,0,1);
+ patch_.metalMix=clamp(p.metalMix,0,1);
+ patch_.metalColor=clamp(p.metalColor,0,1);
+ patch_.metalDecay=clamp(p.metalDecay,0,1);
  for(int i=0;i<kGraphNodes;i++) {
    auto &node=patch_.graph.nodes[i];
    node.level=float(clamp(node.level,0,1));node.color=float(clamp(node.color,0,1));
