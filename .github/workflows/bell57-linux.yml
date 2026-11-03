@@ -1,7 +1,7 @@
 name: Panoramize Bell57 - DSP-only Linux audio validation
 on:
   push:
-    branches: [feature/bell-56-resonance]
+    branches: [feature/bell-57-morph]
     paths:
       - 'panoramize-src/**'
       - '.github/workflows/bell57-linux.yml'
@@ -22,7 +22,7 @@ jobs:
         run: cmake --build build-bell57 --target panorama_bell57_test panorama_bell57_preview --parallel 4
       - name: Bell57 regression check
         run: ctest --test-dir build-bell57 -R '^PANORAMA_Bell57$' --output-on-failure
-      - name: Render original / evolved / shimmer comparison WAV
+      - name: Render six-way Bell57 comparison WAV
         run: ./build-bell57/panorama_bell57_preview bell57-previews
       - uses: actions/upload-artifact@v4
         if: always()
