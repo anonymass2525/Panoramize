@@ -1,7 +1,7 @@
-name: Panoramize 5.6 Bell DSP - Windows VST3 + audio regression
+name: Panoramize 5.7 Bell DSP - Windows VST3 + audio regression
 on:
   push:
-    branches: [feature/bell-56-resonance]
+    branches: [feature/bell-57-morph]
     paths:
       - "panoramize-src/**"
       - ".github/workflows/bell57-ci.yml"
