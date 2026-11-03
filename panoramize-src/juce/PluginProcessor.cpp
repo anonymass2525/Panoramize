@@ -46,6 +46,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PanoramaProcessor::createLay
  addFloatLayoutParameter(v,"bellDynamics","Bell Spectral Evolution",0.f,1.f,0.f);
  addFloatLayoutParameter(v,"bellCoupling","Bell Mode Coupling",0.f,1.f,0.f);
  addFloatLayoutParameter(v,"bellClarity","Bell Tail Clarity",0.f,1.f,0.f);
+ addFloatLayoutParameter(v,"bell57Morph","Bell Original Coupled Morph",0.f,1.f,0.f);
+ addFloatLayoutParameter(v,"bell57Bloom","Bell Resonance Bloom Time",0.f,1.f,.5f);
  // v0.3: genuine audio-rate graph: nine nodes, each with editable type, inputs, and two controls.
  const juce::StringArray nodeTypes{"Off","VA","Digital FM","Noise","Ring","Mix","Wavefolder","Modal Resonator","Low-pass","Gain","Harmonic Additive","Phase Warp","Coupled Modes","Resonant Exchange","Phase Ecology","Spectral Matter","Matter Weave","Formant Field","Phase-Matter Bridge","Physical Body","Unified Coupler","Mesh Body","Feedback Delay","Passive Body"};
  juce::StringArray inputChoices{"None"};
@@ -118,6 +120,7 @@ void PanoramaProcessor::loadPreset(int index){
  write("routing",(float)p.routing);write("crossDepth",p.crossDepth);write("stereoResonance",p.stereoResonance);
  write("metalMix",p.metalMix);write("metalColor",p.metalColor);write("metalDecay",p.metalDecay);
  write("bellDynamics",p.bellDynamics);write("bellCoupling",p.bellCoupling);write("bellClarity",p.bellClarity);
+ write("bell57Morph",p.bell57Morph);write("bell57Bloom",p.bell57Bloom);
  for(int i=0;i<panorama::kGraphNodes;i++){
    const auto&n=p.graph.nodes[i];
    if(i<panorama::kGraphNodes-1)write(graphTypeIds[i],(float)((int)n.type>=11?(int)n.type-1:(int)n.type));
@@ -230,6 +233,7 @@ panorama::Patch PanoramaProcessor::getPatchFromParameters()const{
  p.crossDepth=get("crossDepth");p.stereoResonance=get("stereoResonance");
  p.metalMix=get("metalMix");p.metalColor=get("metalColor");p.metalDecay=get("metalDecay");
  p.bellDynamics=get("bellDynamics");p.bellCoupling=get("bellCoupling");p.bellClarity=get("bellClarity");
+ p.bell57Morph=get("bell57Morph");p.bell57Bloom=get("bell57Bloom");
  for(int i=0;i<panorama::kGraphNodes;i++){
    auto&n=p.graph.nodes[i];
    // Node 9 is a fixed Output and intentionally has no gType8 parameter.

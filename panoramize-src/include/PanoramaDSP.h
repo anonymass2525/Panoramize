@@ -46,6 +46,8 @@ struct Patch {
     float metalMix=0.f, metalColor=0.5f, metalDecay=0.5f;
     // Bell 5.6: independent optional coupled-mode evolution; zero restores 5.5 sound.
     float bellDynamics=0.f, bellCoupling=0.f, bellClarity=0.f;
+    // v5.7: Original attack -> coupled resonator bloom; defaults bypass exactly.
+    float bell57Morph=0.f, bell57Bloom=0.5f;
 };
 const std::array<Patch,kPresetCount>& factoryPresets();
 // Exact comparison of all DSP-relevant patch settings; allocation-free.
@@ -120,6 +122,7 @@ private:
         std::array<BellMode,8> companion{};
         double bellStrike=0.,bellStrikePole=0.,bellCouplingCos=1.,bellCouplingSin=0.;
         double bellDynamicsSmoothed=0.,bellSmoothCoef=0.;
+        double bell57Rise=0.,bell57RisePole=0.;
         struct GraphState {
             double phase=0,mod=0,filterL=0,filterR=0,noiseLevel=1, couplingSmooth=0;
             double unisonPhase[3]{};

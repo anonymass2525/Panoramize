@@ -1,0 +1,33 @@
+name: Panoramize Bell57 - DSP-only Linux audio validation
+on:
+  push:
+    branches: [feature/bell-57-morph]
+    paths:
+      - 'panoramize-src/**'
+      - '.github/workflows/bell57-linux.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bell57-dsp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure standalone DSP
+        run: cmake -S panoramize-src -B build-bell57 -DCMAKE_BUILD_TYPE=Release -DPANORAMA_BUILD_VST3=OFF
+      - name: Build only Bell57 test and renderer
+        run: cmake --build build-bell57 --target panorama_bell57_test panorama_bell57_preview --parallel 4
+      - name: Bell57 regression check
+        run: ctest --test-dir build-bell57 -R '^PANORAMA_Bell57$' --output-on-failure
+      - name: Render six-way Bell57 comparison WAV
+        run: ./build-bell57/panorama_bell57_preview bell57-previews
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Panoramize-Bell57-Dry-Audio-Previews-Linux
+          path: bell57-previews/
+          if-no-files-found: warn
+          retention-days: 90
