@@ -132,11 +132,13 @@ bool samePatchConfiguration(const Patch& a,const Patch& b) noexcept {
  if(std::tie(a.name,a.engine,a.cutoff,a.resonance,a.attack,a.decay,a.sustain,a.release,
              a.detune,a.unison,a.fm,a.fold,a.resonanceBody,a.damping,a.motion,
              a.blend,a.brightness,a.gain,a.routing,a.crossDepth,a.stereoResonance,
-             a.metalMix,a.metalColor,a.metalDecay,a.bellDynamics,a.bellCoupling,a.bellClarity)
+             a.metalMix,a.metalColor,a.metalDecay,a.bellDynamics,a.bellCoupling,a.bellClarity,
+             a.bell57Morph,a.bell57Bloom)
    !=std::tie(b.name,b.engine,b.cutoff,b.resonance,b.attack,b.decay,b.sustain,b.release,
              b.detune,b.unison,b.fm,b.fold,b.resonanceBody,b.damping,b.motion,
              b.blend,b.brightness,b.gain,b.routing,b.crossDepth,b.stereoResonance,
-             b.metalMix,b.metalColor,b.metalDecay,b.bellDynamics,b.bellCoupling,b.bellClarity))return false;
+             b.metalMix,b.metalColor,b.metalDecay,b.bellDynamics,b.bellCoupling,b.bellClarity,
+             b.bell57Morph,b.bell57Bloom))return false;
  for(int i=0;i<kGraphNodes;i++){
   const auto& x=a.graph.nodes[(size_t)i];const auto& y=b.graph.nodes[(size_t)i];
   if(std::tie(x.type,x.a,x.b,x.level,x.color)!=std::tie(y.type,y.a,y.b,y.level,y.color))return false;
@@ -243,10 +245,17 @@ void Synth::Voice::start(int midi,float velocity,int ch,uint64_t count,double sr
  // Bell 5.6 adds a companion modal family, so legacy 5.5 resonances remain
  // unmodified and all newer timbres can be bypassed without approximations.
  bellStrike=1.;
+ bell57Rise=0.;
+ // A note-on sampled bloom time avoids reconfiguring poles in the callback.
+ bell57RisePole=std::exp(-1./(sr*(.018+.17*clamp(p.bell57Bloom,0.,1.))));
  bellDynamicsSmoothed=clamp(p.bellDynamics,0.,1.);
  bellSmoothCoef=1.-std::exp(-1./(sr*.012));
  bellStrikePole=std::exp(-1./(sr*(.0045+.006*bellDynamicsSmoothed)));
- const double angle=.00065*clamp(p.bellCoupling,0.,1.)*48000./sr;
+ // 5.7's coupled mode gain is note-on sampled; old 5.6 path unchanged
+ // whenever morph=0, and the original/5.5 path bypasses both modes.
+ const double strongerCoupling=clamp(p.bell57Morph,0.,1.)*
+                              clamp(p.bellDynamics,0.,1.)*.24;
+ const double angle=.00065*clamp(p.bellCoupling+strongerCoupling,0.,1.)*48000./sr;
  bellCouplingCos=std::cos(angle);bellCouplingSin=std::sin(angle);
  for(int i=0;i<8;i++){
    auto& b=companion[(size_t)i];b=BellMode{};
@@ -407,6 +416,23 @@ double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,doub
       const double amount=.48*wet*bellDynamicsSmoothed;
       bellExtraL=amount*std::tanh(rawL*.85);
       bellExtraR=amount*std::tanh(rawR*.85);
+    }
+    // When disabled the entire 5.6 output path remains untouched. When
+    // enabled a struck note begins close to the sharp Original carrier,
+    // then fades in a coupled modal body without re-triggering excitation.
+    const double morph=clamp(p.bell57Morph,0.,1.)*
+                       clamp(p.bellDynamics,0.,1.);
+    bell57Rise=1.-(1.-bell57Rise)*bell57RisePole;
+    if(morph>0.){
+      const double bloom=bell57Rise;
+      const double originalBlend=(1.-.14*bloom)*fmOut;
+      const double bodyBlend=.32*wet*bloom;
+      outL=(1.-morph)*outL+morph*(originalBlend+bodyBlend*physicalL);
+      outR=(1.-morph)*outR+morph*(originalBlend+bodyBlend*physicalR);
+      // The coupled tail is introduced after the attack, not layered in
+      // full at note-on; its own envelope and energy constraints remain.
+      bellExtraL*=1.-morph*(1.-bloom);
+      bellExtraR*=1.-morph*(1.-bloom);
     }
   }
   break;
@@ -1176,6 +1202,8 @@ void Synth::setPatch(const Patch& p){
  patch_.bellDynamics=clamp(p.bellDynamics,0,1);
  patch_.bellCoupling=clamp(p.bellCoupling,0,1);
  patch_.bellClarity=clamp(p.bellClarity,0,1);
+ patch_.bell57Morph=clamp(p.bell57Morph,0,1);
+ patch_.bell57Bloom=clamp(p.bell57Bloom,0,1);
  for(int i=0;i<kGraphNodes;i++) {
    auto &node=patch_.graph.nodes[i];
    node.level=float(clamp(node.level,0,1));node.color=float(clamp(node.color,0,1));

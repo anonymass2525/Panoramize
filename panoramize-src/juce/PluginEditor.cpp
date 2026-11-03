@@ -150,6 +150,8 @@ PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),proc
  addKnob("bellDynamics","BELL EVOLUTION");
  addKnob("bellCoupling","MODE COUPLING / NEXT NOTE");
  addKnob("bellClarity","TAIL CLARITY / NEXT NOTE");
+ addKnob("bell57Morph","ORIGINAL / COUPLED MORPH");
+ addKnob("bell57Bloom","RESONANCE BLOOM / NEXT NOTE");
  initGraph();
  initModulation();
  viewport.setViewedComponent(&content,false);viewport.setScrollBarsShown(true,false);addAndMakeVisible(viewport);
@@ -202,7 +204,7 @@ void PanoramaEditor::resized(){
  viewport.setBounds(15,216,w-30,h-247);
  unifiedPanel.setBounds(15,136,w-30,h-167);
  const int cw0=std::max(700,viewport.getWidth()-14);
- content.setSize(cw0,860+6*180+24);
+ content.setSize(cw0,860+7*180+24);
  graphStatus.setBounds(23,184,w-46,22);
  const int cw=cw0;
  for(int i=0;i<panorama::kGraphNodes;i++){
