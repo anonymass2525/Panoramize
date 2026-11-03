@@ -253,7 +253,7 @@ void Synth::Voice::start(int midi,float velocity,int ch,uint64_t count,double sr
    const double iRatio=ratios[i]*(1.+.0035*std::sin(double(i)*2.17+.39));
    const double hz=baseHz*iRatio*(1.+.012*(p.metalColor-.5f));
    // Mute out-of-band companions rather than clamping them all to Nyquist.
-   if(hz>sr*.40){b.strike=0.;b.pickup=0.;continue;}
+   if(hz>sr*.40){b.strike=0.;b.pickup=0.;b.r=.995;continue;}
    const double w=twoPi*hz/sr;
    b.cw=std::cos(w);b.sw=std::sin(w);
    const double t60=(.35+3.5*clamp(p.metalDecay,0.,1.))
@@ -373,9 +373,11 @@ double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,doub
     // preserving total x^2+v^2 in absence of excitation and damping.
     const double target=clamp(p.bellDynamics,0.,1.);
     bellDynamicsSmoothed+=(target-bellDynamicsSmoothed)*bellSmoothCoef;
+    // Evolve the strike clock even while bypassed: switching on mid-note
+    // must not replay a brand-new metallic attack.
+    const double strike=bellStrike*(.62*trans+.38*fmOut);
+    bellStrike*=bellStrikePole;
     if(bellDynamicsSmoothed>1.e-7){
-      const double strike=bellStrike*(.62*trans+.38*fmOut);
-      bellStrike*=bellStrikePole;
       for(int i=0;i<8;i++){
         auto& b=companion[(size_t)i];
         b.v+=strike*b.strike*.095;
