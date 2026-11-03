@@ -36,6 +36,9 @@ const std::array<Patch,kPresetCount>& factoryPresets(){
  // metalMix=0 on earlier sessions restores the original sample path.
  v[4].metalMix=.57f;v[4].metalColor=.66f;v[4].metalDecay=.75f;
  v[4].stereoResonance=.24f;
+ // 5.6: Evolved's familiar dry core remains; these opt-in controls create
+ // subtle moving partials and a smoother, decoupled release spectrum.
+ v[4].bellDynamics=.58f;v[4].bellCoupling=.34f;v[4].bellClarity=.62f;
  // v0.4: reimagined additive and phase-warp sound design; these are deliberately
  // not required to resemble the v0.1 VA/legacy factory sounds.
  v[24]={"25 / Midnight Geometry Reforged",Engine::Modular,.88f,.15f,.045f,.65f,.69f,1.1f,.23f,.55f,.59f,.52f,.83f,.26f,.52f,.53f,.84f,.48f};

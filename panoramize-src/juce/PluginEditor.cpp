@@ -147,6 +147,9 @@ PanoramaEditor::PanoramaEditor(PanoramaProcessor&p):AudioProcessorEditor(p),proc
  addKnob("crossDepth","ROUTING DEPTH");addKnob("stereoResonance","RESONATOR WIDTH");
  addKnob("metalMix","BELL METAL BODY");addKnob("metalColor","METALLIC COLOR");
  addKnob("metalDecay","BELL TAIL / NEXT NOTE");
+ addKnob("bellDynamics","BELL EVOLUTION");
+ addKnob("bellCoupling","MODE COUPLING / NEXT NOTE");
+ addKnob("bellClarity","TAIL CLARITY / NEXT NOTE");
  initGraph();
  initModulation();
  viewport.setViewedComponent(&content,false);viewport.setScrollBarsShown(true,false);addAndMakeVisible(viewport);
@@ -161,6 +164,9 @@ void PanoramaEditor::addKnob(const char*id,const char*name){
  k.slider->setTextBoxStyle(juce::Slider::TextBoxBelow,false,84,20);
  if(juce::String(id)=="metalDecay")k.slider->setTooltip("Decay is applied when a NEW note is struck. Existing resonances finish naturally.");
  if(juce::String(id)=="metalMix")k.slider->setTooltip("0: original Fractal Digital sound. 1: stronger parallel inharmonic metallic body.");
+ if(juce::String(id)=="bellDynamics")k.slider->setTooltip("0: reproduce Evolved 5.5. Add the coupled metallic companion body above 0.");
+ if(juce::String(id)=="bellCoupling")k.slider->setTooltip("Passive, energy-preserving mode exchange; coupling coefficient is sampled when a new note starts.");
+ if(juce::String(id)=="bellClarity")k.slider->setTooltip("Extra high-mode damping for a cleaner tail. Sampled at note-on.");
  k.slider->setColour(juce::Slider::textBoxTextColourId,juce::Colours::white);
  k.attachment=std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processor.params,id,*k.slider);
  content.addAndMakeVisible(*k.label);content.addAndMakeVisible(*k.slider);
