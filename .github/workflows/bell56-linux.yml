@@ -1,0 +1,33 @@
+name: Panoramize Bell56 - DSP-only Linux audio validation
+on:
+  push:
+    branches: [feature/bell-56-resonance]
+    paths:
+      - 'panoramize-src/**'
+      - '.github/workflows/bell56-linux.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bell56-dsp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure standalone DSP
+        run: cmake -S panoramize-src -B build-bell56 -DCMAKE_BUILD_TYPE=Release -DPANORAMA_BUILD_VST3=OFF
+      - name: Build only Bell56 test and renderer
+        run: cmake --build build-bell56 --target panorama_bell56_test panorama_bell56_preview --parallel 4
+      - name: Bell56 regression check
+        run: ctest --test-dir build-bell56 -R '^PANORAMA_Bell56$' --output-on-failure
+      - name: Render original / evolved / shimmer comparison WAV
+        run: ./build-bell56/panorama_bell56_preview bell56-previews
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Panoramize-Bell56-Dry-Audio-Previews-Linux
+          path: bell56-previews/
+          if-no-files-found: warn
+          retention-days: 90

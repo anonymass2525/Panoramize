@@ -44,6 +44,8 @@ struct Patch {
     // v5.5: opt-in inharmonic bell resonator in the Fractal Digital engine.
     // Defaults keep all existing hand-authored and legacy patches bit-identical.
     float metalMix=0.f, metalColor=0.5f, metalDecay=0.5f;
+    // Bell 5.6: independent optional coupled-mode evolution; zero restores 5.5 sound.
+    float bellDynamics=0.f, bellCoupling=0.f, bellClarity=0.f;
 };
 const std::array<Patch,kPresetCount>& factoryPresets();
 // Exact comparison of all DSP-relevant patch settings; allocation-free.
@@ -112,6 +114,12 @@ private:
         double crossDelay=0; // one-sample delay prevents zero-delay algebraic feedback
         Envelope env;
         std::array<Mode,8> modes{};
+        // Energy-normalized companion resonators: orthogonal coupling cannot
+        // amplify their unforced total squared state norm.
+        struct BellMode {double x=0.,v=0.,cw=1.,sw=0.,r=1.,strike=0.,pickup=0.;};
+        std::array<BellMode,8> companion{};
+        double bellStrike=0.,bellStrikePole=0.,bellCouplingCos=1.,bellCouplingSin=0.;
+        double bellDynamicsSmoothed=0.,bellSmoothCoef=0.;
         struct GraphState {
             double phase=0,mod=0,filterL=0,filterR=0,noiseLevel=1, couplingSmooth=0;
             double unisonPhase[3]{};

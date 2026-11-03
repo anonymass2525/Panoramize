@@ -132,11 +132,11 @@ bool samePatchConfiguration(const Patch& a,const Patch& b) noexcept {
  if(std::tie(a.name,a.engine,a.cutoff,a.resonance,a.attack,a.decay,a.sustain,a.release,
              a.detune,a.unison,a.fm,a.fold,a.resonanceBody,a.damping,a.motion,
              a.blend,a.brightness,a.gain,a.routing,a.crossDepth,a.stereoResonance,
-             a.metalMix,a.metalColor,a.metalDecay)
+             a.metalMix,a.metalColor,a.metalDecay,a.bellDynamics,a.bellCoupling,a.bellClarity)
    !=std::tie(b.name,b.engine,b.cutoff,b.resonance,b.attack,b.decay,b.sustain,b.release,
              b.detune,b.unison,b.fm,b.fold,b.resonanceBody,b.damping,b.motion,
              b.blend,b.brightness,b.gain,b.routing,b.crossDepth,b.stereoResonance,
-             b.metalMix,b.metalColor,b.metalDecay))return false;
+             b.metalMix,b.metalColor,b.metalDecay,b.bellDynamics,b.bellCoupling,b.bellClarity))return false;
  for(int i=0;i<kGraphNodes;i++){
   const auto& x=a.graph.nodes[(size_t)i];const auto& y=b.graph.nodes[(size_t)i];
   if(std::tie(x.type,x.a,x.b,x.level,x.color)!=std::tie(y.type,y.a,y.b,y.level,y.color))return false;
@@ -240,6 +240,28 @@ void Synth::Voice::start(int midi,float velocity,int ch,uint64_t count,double sr
    m.r=q; m.cosw=2.*std::cos(twoPi*hz/sr);
    m.energy=(1./(1.+i*.8))*((i%3==0)?1.:-.74);
  }
+ // Bell 5.6 adds a companion modal family, so legacy 5.5 resonances remain
+ // unmodified and all newer timbres can be bypassed without approximations.
+ bellStrike=1.;
+ bellDynamicsSmoothed=clamp(p.bellDynamics,0.,1.);
+ bellSmoothCoef=1.-std::exp(-1./(sr*.012));
+ bellStrikePole=std::exp(-1./(sr*(.0045+.006*bellDynamicsSmoothed)));
+ const double angle=.00065*clamp(p.bellCoupling,0.,1.)*48000./sr;
+ bellCouplingCos=std::cos(angle);bellCouplingSin=std::sin(angle);
+ for(int i=0;i<8;i++){
+   auto& b=companion[(size_t)i];b=BellMode{};
+   const double iRatio=ratios[i]*(1.+.0035*std::sin(double(i)*2.17+.39));
+   const double hz=baseHz*iRatio*(1.+.012*(p.metalColor-.5f));
+   // Mute out-of-band companions rather than clamping them all to Nyquist.
+   if(hz>sr*.40){b.strike=0.;b.pickup=0.;b.r=.995;continue;}
+   const double w=twoPi*hz/sr;
+   b.cw=std::cos(w);b.sw=std::sin(w);
+   const double t60=(.35+3.5*clamp(p.metalDecay,0.,1.))
+                  *std::exp(-double(i)*(.10+.19*clamp(p.bellClarity,0.,1.)));
+   b.r=std::exp(-6.907755278982137/(sr*t60));
+   b.strike=(1./(1.+i*.65))*((i%3==1)?-.78:1.);
+   b.pickup=(1./(1.+i*.48))*((i%3==1)?-.80:1.);
+ }
 }
 double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,double baseCutoff,float wheel,Sample& stereo,
     const std::array<int,kGraphNodes>& order,int renderCount,
@@ -329,6 +351,9 @@ double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,doub
  const double physicalL=std::tanh((modalL+.18*drive)*(.75+1.4*p.resonanceBody));
  const double physicalR=std::tanh((modalR+.18*drive)*(.75+1.4*p.resonanceBody));
  double outL=0,outR=0;
+ // 5.6 companion body is routed separately so its natural tail can outlive
+ // the direct envelope without changing the established 5.5 audio path.
+ double bellExtraL=0.,bellExtraR=0.;
  switch(p.engine){
  case Engine::CrystalVA:outL=vaL;outR=vaR;break;
  case Engine::FractalDigital:{
@@ -342,6 +367,47 @@ double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,doub
     const double bodyGain=.68+.26*clamp(p.resonanceBody,0.,1.);
     outL=(1.-.30*wet)*fmOut+wet*bodyGain*physicalL;
     outR=(1.-.30*wet)*fmOut+wet*bodyGain*physicalR;
+    // Optional energy-normalized resonator network: independently excited
+    // nearby partials create density and time-varying beat structures.
+    // Adjacent complex-oscillator pairs are mixed by orthogonal rotations,
+    // preserving total x^2+v^2 in absence of excitation and damping.
+    const double target=clamp(p.bellDynamics,0.,1.);
+    bellDynamicsSmoothed+=(target-bellDynamicsSmoothed)*bellSmoothCoef;
+    // Evolve the strike clock even while bypassed: switching on mid-note
+    // must not replay a brand-new metallic attack.
+    const double strike=bellStrike*(.62*trans+.38*fmOut);
+    bellStrike*=bellStrikePole;
+    if(bellDynamicsSmoothed>1.e-7){
+      for(int i=0;i<8;i++){
+        auto& b=companion[(size_t)i];
+        b.v+=strike*b.strike*.095;
+        const double x=(b.x*b.cw+b.v*b.sw)*b.r;
+        const double v=(b.v*b.cw-b.x*b.sw)*b.r;
+        b.x=x;b.v=v;
+      }
+      if(bellCouplingSin>1.e-12){
+        for(int i=0;i<7;i++){
+          auto& a=companion[(size_t)i];
+          auto& b=companion[(size_t)i+1];
+          const double ax=a.x,av=a.v;
+          a.x=bellCouplingCos*ax+bellCouplingSin*b.x;
+          a.v=bellCouplingCos*av+bellCouplingSin*b.v;
+          b.x=bellCouplingCos*b.x-bellCouplingSin*ax;
+          b.v=bellCouplingCos*b.v-bellCouplingSin*av;
+        }
+      }
+      double rawL=0.,rawR=0.;
+      for(int i=0;i<8;i++){
+        const auto& b=companion[(size_t)i];
+        const double partial=b.x*b.pickup;
+        const double pan=((i&1)?-1.:1.)*(.15+.065*i)*p.stereoResonance;
+        rawL+=partial*(1.+pan);
+        rawR+=partial*(1.-pan);
+      }
+      const double amount=.48*wet*bellDynamicsSmoothed;
+      bellExtraL=amount*std::tanh(rawL*.85);
+      bellExtraR=amount*std::tanh(rawR*.85);
+    }
   }
   break;
  }
@@ -382,8 +448,12 @@ double Synth::Voice::process(double sr,const Patch& p,double bendMultiplier,doub
  double mono=lp(.5*(outL+outR));
  double spread=.5*(outL-outR)*(.6+p.unison*.5);
  double gain=(.15+.70*vel)*envVal*p.gain;
- stereo.left=float(dbSmooth((mono+spread)*gain));
- stereo.right=float(dbSmooth((mono-spread)*gain));
+ // Body decay retains its own modal T60; sqrt release attenuation avoids
+ // forcing every metal mode to follow the much faster direct-sound envelope.
+ const double bodyGate=std::sqrt(std::max(0.,envVal));
+ const double bodyGain=(.15+.70*vel)*p.gain*bodyGate;
+ stereo.left=float(dbSmooth((mono+spread)*gain+bellExtraL*bodyGain));
+ stereo.right=float(dbSmooth((mono-spread)*gain+bellExtraR*bodyGain));
  return mono;
 }
 // v0.3 Modular: independent per-voice, per-node stereo DSP with no allocation or lock.
@@ -1103,6 +1173,9 @@ void Synth::setPatch(const Patch& p){
  patch_.metalMix=clamp(p.metalMix,0,1);
  patch_.metalColor=clamp(p.metalColor,0,1);
  patch_.metalDecay=clamp(p.metalDecay,0,1);
+ patch_.bellDynamics=clamp(p.bellDynamics,0,1);
+ patch_.bellCoupling=clamp(p.bellCoupling,0,1);
+ patch_.bellClarity=clamp(p.bellClarity,0,1);
  for(int i=0;i<kGraphNodes;i++) {
    auto &node=patch_.graph.nodes[i];
    node.level=float(clamp(node.level,0,1));node.color=float(clamp(node.color,0,1));
